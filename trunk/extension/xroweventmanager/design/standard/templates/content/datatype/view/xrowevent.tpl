@@ -1,3 +1,5 @@
+{* we shouldn`t cache this *}
+{set-block scope=root variable=cache_ttl}0{/set-block}
 {def $person_array=$attribute.content.persons
      $person_count=$person_array|count
      $participants_array=$attribute.content.participants
@@ -37,6 +39,8 @@
         </div>
     </div>
     <div class="break"></div>
+    {* This functionality should be only accessable over the backend's event tab.
+       We leave it in here if one might still need it.
     <div class="block">
         <div class="element">
             <strong>{$person_count|wash} {"person(s)"|i18n("extension/xroweventmanager")}</strong><br />
@@ -49,8 +53,9 @@
             {/if}
         </div>
     </div>
+    *}
     <div class="break"></div>
-    {if $start_date|gt($date)}
+    {if $start_date|le($date)}
         {if $current_user.is_logged_in}
             <form action={"/xrowevent/action"|ezurl} method="post" name="xroweventform" id="xroweventform">
                 <input type="hidden" name="EventID" value="{$attribute.content.contentobject_id}" />
@@ -67,11 +72,31 @@
             {/if}
             </form>
         {else}
-            <p>{"If you want to join this event, please login:"|i18n("extension/xroweventmanager")}
-            <a href={"user/login"|ezurl}>{"Login"|i18n("extension/xroweventmanager")}</a></p>
+            <p>{"If you want to join this event, please login:"|i18n("extension/xroweventmanager")}</p>
+            <form action={"user/login"|ezurl} method="post" enctype="multipart/form-data">
+            <div class="block">
+                 <div class="element">
+                    <label for="id1">{"Username"|i18n("design/ezwebin/user/login",'User name')}
+                    <input class="halfbox" type="text" size="10" name="Login" id="id1" value="" tabindex="1" />
+                    </label>
+                 </div>
+                 <div class="element">
+                    <label for="id2">{"Password"|i18n("design/ezwebin/user/login")}
+                    <input class="halfbox" type="password" size="10" name="Password" id="id2" value="" tabindex="1" />
+                    </label>
+                 </div>
+                 <div class="element">
+                    <input class="defaultbutton" type="submit" name="LoginButton" value="{'Login'|i18n('design/ezwebin/user/login','Button')}" tabindex="1" />
+                 </div>
+                 <div class="element">
+                    <input class="button" type="submit" name="RegisterButton" id="RegisterButton" value="{'Register new user'|i18n('design/ezwebin/user/login','Button')}" tabindex="1" />
+                 </div>
+            </div>
+            <input name="RedirectURI" type="hidden" value="{$attribute.object.main_node.url_alias}" /> 
+            </form>       
         {/if}
     {else}
-        <p>{"Event is in the past, subscription isn't possible."|i18n("extension/xroweventmanager")}</p>
+        <p>{"Event subscription has ended. A subscription isn't possible anymore."|i18n("extension/xroweventmanager")}</p>
     {/if}
     
     {* Show all participants to all event persons *}

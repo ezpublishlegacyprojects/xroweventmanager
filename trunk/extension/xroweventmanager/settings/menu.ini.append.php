@@ -1,13 +1,13 @@
 <?php /* #?ini charset="utf-8"?
 
 [NavigationPart]
-Part[xroweventnavigationpart]=Events
+Part[xroweventmanager]=Events
 
 [TopAdminMenu]
-Tabs[]=xrowevent
+Tabs[]=xroweventmanager
 
-[Topmenu_xrowevent]
-NavigationPartIdentifier=xroweventnavigationpart
+[Topmenu_xroweventmanager]
+NavigationPartIdentifier=xroweventmanager
 Tooltip=Manage your events
 Name=Events
 URL[]
