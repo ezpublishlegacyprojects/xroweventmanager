@@ -48,7 +48,6 @@
 	<th class="tight">{'end'|i18n( 'extension/xroweventmanager' )}</th>
 	<th class="tight">{'persons'|i18n( 'extension/xroweventmanager' )}</th>
 	<th class="tight">{'participants'|i18n( 'extension/xroweventmanager' )}</th>
-	<th class="tight">&nbsp;</th>
 </tr>
 {foreach $event_list as $key => $event sequence array( bglight, bgdark ) as $seq}
 
@@ -59,14 +58,6 @@
 	<td nowrap="nowrap">{if $event.end_date|gt(0)}{$event.end_date|l10n( shortdatetime )}{else}&nbsp;{/if}</td>
 	<td class="number" align="right">{$event.person_count}</td>
 	<td class="number" align="right">{$event.participants_count} ({$event.max_participants})</td>
-	{* Edit button *}
-    <td>
-    {section show=$event.event_object.can_edit}
-        <a href={concat( 'content/edit/', $event.event_object.contentobject_id )|ezurl}><img src={'edit.gif'|ezimage} alt="{'Edit'|i18n( 'design/admin/node/view/full' )}" title="{'Edit <%child_name>.'|i18n( 'design/admin/node/view/full',, hash( '%child_name', $event.event_object.name ) )|wash}" /></a>
-    {section-else}
-        <img src={'edit-disabled.gif'|ezimage} alt="{'Edit'|i18n( 'design/admin/node/view/full' )}" title="{'You do not have permissions to edit %child_name.'|i18n( 'design/admin/node/view/full',, hash( '%child_name', $event.event_object.name ) )|wash}" />
-    {/section}
-    </td>
 </tr>
 {/foreach}
 </table>

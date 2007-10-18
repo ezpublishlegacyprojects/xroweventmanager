@@ -11,7 +11,7 @@
 	 $person_array=$attribute.content.persons
 	 $participants_array=$attribute.content.participants
 }
-{if and($start_timestamp|eq(0),$status|gt(0))}
+{if $start_timestamp|eq(0)}
     {def $start_year=""
     	 $start_month=""
     	 $start_day=""
@@ -19,7 +19,6 @@
     	 $start_min=""
     }
 {else}
-    {if and($start_timestamp|eq(0),$status|eq(0))}{set $start_timestamp=$date}{/if}
     {def $start_year=$start_timestamp|datetime(custom,"%Y")
     	 $start_month=$start_timestamp|datetime(custom,"%m")
     	 $start_day=$start_timestamp|datetime(custom,"%d")
@@ -27,7 +26,7 @@
     	 $start_min=$start_timestamp|datetime(custom,"%i")
     }
 {/if}
-{if and($end_timestamp|eq(0),$status|gt(0))}
+{if $end_timestamp|eq(0)}
     {def $end_year=""
     	 $end_month=""
     	 $end_day=""
@@ -35,7 +34,6 @@
     	 $end_min=""
     }
 {else}
-    {if and($end_timestamp|eq(0),$status|eq(0))}{set $end_timestamp=$date}{/if}
     {def $end_year=$end_timestamp|datetime(custom,"%Y")
     	 $end_month=$end_timestamp|datetime(custom,"%m")
     	 $end_day=$end_timestamp|datetime(custom,"%d")
@@ -154,11 +152,9 @@
 <div class="block">
     <div class="element">
         <label>{"Max. participants"|i18n("extension/xroweventmanager")}</label><div class="labelbreak"></div>
-        <select name="{$attribute_base}_xrowevent_max_participants_{$attribute.id}" title="{"Please enter the max. participants."|i18n("extension/xroweventmanager")}">
-        {for 1 to 100 as $i}
-            <option value="{$i}"{if eq($max_participants,$i)} selected="selected"{/if}>{$i}</option>
-        {/for}
-        </select>
+        
+        <input id="ezcoa-{if ne( $attribute_base, 'ContentObjectAttribute' )}{$attribute_base}-{/if}{$attribute.contentclassattribute_id}_{$attribute.contentclass_attribute_identifier}" class="box ezcc-{$attribute.object.content_class.identifier} ezcca-{$attribute.object.content_class.identifier}_{$attribute.contentclass_attribute_identifier}" type="text" name="{$attribute_base}_xrowevent_max_participants_{$attribute.id}" size="10" value="{$max_participants}" />
+        
     </div>
     
     <div class="element">
@@ -200,7 +196,7 @@
 &nbsp;<input class="button" type="submit" name="CustomActionButton[{$attribute.id}_add_persons]" value="{'Add persons'|i18n( 'extension/xroweventmanager' )}" />
 
 {if $attribute.content.person_user_exists|not}
-&nbsp;<input class="button" type="submit" name="CustomActionButton[{$attribute.id}_add_myself]" value="{'Add myself'|i18n( 'extension/xroweventmanager' )}" />
+&nbsp;<input class="button" type="submit" name="CustomActionButton[{$attribute.id}_add_me]" value="{'Add me'|i18n( 'extension/xroweventmanager' )}" />
 {/if}
 
 </div>

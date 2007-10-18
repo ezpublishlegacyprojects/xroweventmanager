@@ -1,8 +1,9 @@
-{def $page_limit=10 
+{def $page_limit=15
      $participant_array=fetch( 'xrowevent', 'participant_list', hash( 'event_id', $event_id,
                                                                       'offset', $offset,
                                                                       'limit', $page_limit,
-                                                                      'sort_array', array( array( 'created', 'desc' ) ) ) )}
+                                                                      'sort_array', array( array( 'created', 'desc' ) ) ) )
+}
 
 <form action={concat( 'xrowevent/action' )|ezurl} method="post" name="xrowevent" id="xrowevent">
 
@@ -49,11 +50,11 @@
         {$event.status_text|wash}
     </div>
 </div>
-
+{if $person_count|gt(0)}
 <div class="break"></div>
 <div class="block">    
    
-<h3>{$event.person_count} {"Persons"|i18n( 'extension/xroweventmanager' )}</h3>
+<h3>{$person_count} {"person(s)"|i18n( 'extension/xroweventmanager' )}</h3>
 <table class="list" cellspacing="0">
 <tr>
     <th class="wide">{'Person(s)'|i18n( 'extension/xroweventmanager' )}</th>
@@ -66,10 +67,14 @@
 {/foreach}
 </table>
 </div>
+{/if}
 
 <div class="break"></div>
 <div class="block">    
-<h3>{$participants_count} {"Participants"|i18n( 'extension/xroweventmanager' )}</h3>
+
+{if $participants_count|gt(0)}
+<h3>{$participants_count} {"participant(s)"|i18n( 'extension/xroweventmanager' )}</h3>
+
 <div class="content-navigation-childlist">
     <table class="list" cellspacing="0">
     <tr>
@@ -100,10 +105,12 @@
     {/foreach}
 
 </table>
-</div>
 
-<p>&nbsp;</p>
-<div class="buttonblock">
+{else}
+    <p>{"No participants yet."|i18n( 'extension/xroweventmanager' )}</p>
+{/if}
+</div>
+<div class="block">
 
 <input class="button" type="submit" name="RemoveParticipantListButton" value="{'Remove selected'|i18n( 'extension/xroweventmanager' )}" title="{'Remove the selected participants from the list above.'|i18n( 'extension/xroweventmanager' )}" />
 
@@ -119,7 +126,8 @@
 <input class="button" type="submit" name="ExportEventButton" value="{'Export participants'|i18n( 'extension/xroweventmanager' )}" title="{'Export all participants of the event.'|i18n( 'extension/xroweventmanager' )}" />
 
 <input type="hidden" name="EventID" value="{$event_id}" />
-<input type="hidden" name="RedirectURIAfterPublish" value={concat( "xrowevent/event/", $event_id )|ezurl} />
+<input type="hidden" name="RedirectURIAfterPublish" value="{concat( "xrowevent/event/", $event_id )} />
+<input type="hidden" name="RedirectURIAfterExport" value={concat( "xrowevent/event/", $event_id )} />
 
 </div>
 
@@ -128,7 +136,7 @@
 <div class="context-toolbar">
 {include name=navigator
          uri='design:navigator/google.tpl'
-         page_uri='/xrowevent/event'
+         page_uri=concat('xrowevent/event/',$event_id)
          item_count=$participants_count
          view_parameters=$view_parameters
          item_limit=$page_limit}

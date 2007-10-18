@@ -19,26 +19,34 @@ $eventID = $Params['EventID'];
 $event = xrowEvent::fetch( $eventID );
 $user =& eZUser::currentUser();
 
-if ( ( $event->personUserExists() or
-     $user->hasAccessTo( 'xrowevent', 'admin' ) )
-     and is_object( $event ) )
+if ( is_object( $event ) )
 {
-    $viewParameters = array( 'offset' => $offset );
-    $tpl->setVariable( 'view_parameters', $viewParameters );
-    $tpl->setVariable( 'event_id', $eventID );
-    $tpl->setVariable( 'event', $event );
-    $tpl->setVariable( 'participants_count', $event->countParticipants() );
-    $tpl->setVariable( 'person_count', $event->countPersons() );
+    if ( ( $event->personUserExists() or
+         $user->hasAccessTo( 'xrowevent', 'admin' ) )
+         and is_object( $event ) )
+    {
+        $viewParameters = array( 'offset' => $offset );
+        $tpl->setVariable( 'view_parameters', $viewParameters );
+        $tpl->setVariable( 'event_id', $eventID );
+        $tpl->setVariable( 'event', $event );
+        $tpl->setVariable( 'participants_count', $event->countParticipants() );
+        $tpl->setVariable( 'person_count', $event->countPersons() );
+        $tpl->setVariable( 'offset', $offset );
+        
+        $path = array();
+        $path[] = array( 'text' => ezi18n( 'extension/xroweventmanager', 'Event details' ),
+                         'url' => false );
+        
+        $Result = array();
+        $Result['path'] =& $path;
+        
+        $Result['content'] =& $tpl->fetch( 'design:xrowevent/event.tpl' );
     
-    $path = array();
-    $path[] = array( 'text' => ezi18n( 'extension/xroweventmanager', 'Event details' ),
-                     'url' => false );
-    
-    $Result = array();
-    $Result['path'] =& $path;
-    
-    $Result['content'] =& $tpl->fetch( 'design:xrowevent/event.tpl' );
-
+    }
+    else
+    {
+        return $Module->handleError( EZ_ERROR_KERNEL_ACCESS_DENIED, 'kernel' );
+    }
 }
 else
 {

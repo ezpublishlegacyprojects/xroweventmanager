@@ -2,8 +2,7 @@
 {set-block scope=root variable=cache_ttl}0{/set-block}
 {def $person_array=$attribute.content.persons
      $person_count=$person_array|count
-     $participants_array=$attribute.content.participants
-     $participants_count=$participants_array|count
+     $participants_count=$attribute.content.participants_count
      $current_user=fetch( 'user', 'current_user' )
      $max_participants=$attribute.content.max_participants
      $start_date=$attribute.content.start_date
@@ -68,7 +67,12 @@
                     <input class="button" type="submit" name="RemoveParticipant" value="{'Cancel participation'|i18n( 'extension/xroweventmanager' )}" />
                 {/if}
             {else}
-                <p>{"Maximum number of participants reached."|i18n("extension/xroweventmanager")}</p>
+                {if $attribute.content.participant_user_exists}
+                <p>{"You have already joined this event."|i18n("extension/xroweventmanager")}</p>
+                    <input class="button" type="submit" name="RemoveParticipant" value="{'Cancel participation'|i18n( 'extension/xroweventmanager' )}" />
+                {else}
+                    <p>{"Maximum number of participants reached."|i18n("extension/xroweventmanager")}</p>
+                {/if}
             {/if}
             </form>
         {else}
@@ -100,7 +104,9 @@
     {/if}
     
     {* Show all participants to all event persons *}
+    {*
     {if or($attribute.content.person_user_exists,$admin)}
+    {def $participants_array=$attribute.content.participants}
         <div class="block">
             <div class="element">
                 <strong>{$participants_count} {"participant(s)"|i18n("extension/xroweventmanager")}</strong><br />
@@ -117,4 +123,5 @@
         </div>
         <div class="break"></div>
     {/if}
+    *}
 {/if}

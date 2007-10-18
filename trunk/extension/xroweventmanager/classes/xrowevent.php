@@ -149,7 +149,7 @@ class xrowEvent extends eZPersistentObject
             if ( $participantCount < $maxParticipants )
             {
                 $status = XROW_EVENT_STATUS_PLACES_AVAILABLE;
-                $this->setAttribut( 'status', $status );
+                $this->setAttribute( 'status', $status );
                 $this->store();
             }
         }

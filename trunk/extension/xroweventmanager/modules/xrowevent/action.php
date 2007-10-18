@@ -26,13 +26,32 @@ if ( $http->hasPostVariable( 'EventID' ) and $http->hasPostVariable( 'AddPartici
 }
 else if ( $http->hasPostVariable( 'EventID' ) and $http->hasPostVariable( 'RemoveParticipant' ) )
 {
-    if ( $http->hasPostVariable( 'UserID' ) )
-        $userID = $http->postVariable( 'UserID' );
-        
     $eventID = $http->postVariable( 'EventID' );
     $event = xrowEvent::fetch( $eventID );
     if ( is_object( $event ) )
-        $event->removeParticipant( $userID );
+    {
+        $isAllowed = false;
+        if ( $http->hasPostVariable( 'UserID' ) )
+        {
+            $newUserID = $http->postVariable( 'UserID' );
+            if ( $userID != $newUserID )
+            {
+                if ( $user->hasAccessTo( 'xrowevent', 'admin' ) or
+                     $event->personUserExists() )
+                {
+                    $userID = $newUserID;
+                    $isAllowed = true;
+                }
+            }
+            else
+                $isAllowed = true;
+        }
+        else
+            $isAllowed = true;
+        
+        if ( $isAllowed )
+            $event->removeParticipant( $userID );
+    }
     else
         eZDebug::writeError( "Event doesn't exists: $eventID", "xrowevent - remove participant" );
 }
@@ -43,16 +62,24 @@ else if ( $http->hasPostVariable( 'EventID' ) and $http->hasPostVariable( 'Remov
         $deleteIDArray = $http->postVariable( 'DeleteIDArray' );
         
     $eventID = $http->postVariable( 'EventID' );
-    $event = xrowEvent::fetch( $eventID );
-    if ( is_object( $event ) )
-    {    
-        foreach( $deleteIDArray as $key => $item )
-        {
-            $event->removeParticipant( $item );
+    
+    
+    $user =& eZUser::currentUser();
+    $isAdmin = $user->hasAccessTo( 'xrowevent', 'admin' );
+
+    if ( $isAdmin or $event->personUserExists() )
+    {
+        $event = xrowEvent::fetch( $eventID );
+        if ( is_object( $event ) )
+        {    
+            foreach( $deleteIDArray as $key => $item )
+            {
+                $event->removeParticipant( $item );
+            }
         }
+        else
+            eZDebug::writeError( "Event doesn't exists: $eventID", "xrowevent - remove participants" );
     }
-    else
-        eZDebug::writeError( "Event doesn't exists: $eventID", "xrowevent - remove participants" );
 }
 else if ( $http->hasPostVariable( 'EventID' ) and $http->hasPostVariable( 'CancelEventButton' ) )
 {
@@ -97,18 +124,23 @@ else if ( $http->hasPostVariable( 'EventID' ) and $http->hasPostVariable( 'Activ
 else if ( $http->hasPostVariable( 'EventID' ) and $http->hasPostVariable( 'EditEventButton' ) )
 {
     $eventID = $http->postVariable( 'EventID' );
-    if ( $http->hasPostVariable( 'RedirectURIAfterPublish' ) )
+    $eventObj = eZContentObject::fetch( $eventID );
+    if ( is_object( $eventObj ) )
     {
-        $http->setSessionVariable( 'RedirectURIAfterPublish', $http->postVariable( 'RedirectURIAfterPublish' ) );
+        $lang = $eventObj->currentLanguage();
+        if ( $http->hasPostVariable( 'RedirectURIAfterPublish' ) )
+        {
+            $http->setSessionVariable( 'RedirectURIAfterPublish', $http->postVariable( 'RedirectURIAfterPublish' ) );
+        }
+        return $Module->redirect( 'content', 'edit', array( $eventID, '', $lang ) );
     }
-    return $Module->redirect( 'content', 'edit', array( $eventID ) );
 }
 else if ( $http->hasPostVariable( 'EventID' ) and $http->hasPostVariable( 'ExportEventButton' ) )
 {
     $eventID = $http->postVariable( 'EventID' );
-    if ( $http->hasPostVariable( 'RedirectURIAfterPublish' ) )
+    if ( $http->hasPostVariable( 'RedirectURIAfterExport' ) )
     {
-        $http->setSessionVariable( 'RedirectURIAfterPublish', $http->postVariable( 'RedirectURIAfterPublish' ) );
+        $http->setSessionVariable( 'RedirectURIAfterExport', $http->postVariable( 'RedirectURIAfterExport' ) );
     }
     return $Module->redirect( 'xrowevent', 'export', array( $eventID ) );
 }

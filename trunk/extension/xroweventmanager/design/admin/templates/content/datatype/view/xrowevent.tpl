@@ -1,9 +1,6 @@
 {def $person_array=$attribute.content.persons
-     $participants_array=$attribute.content.participants
-     $participants_count=$participants_array|count
-     $current_user=fetch( 'user', 'current_user' )
      $start_date=$attribute.content.start_date
-     $admin=fetch( 'user', 'has_access_to', hash( 'module', 'xrowevent', 'function', 'admin' ) )}
+}
 {if $start_date|gt(0)}
     <div class="block">
         <div class="element">
@@ -45,8 +42,12 @@
             {/if}
         </div>
     </div>
+    {*
     <div class="break"></div>
     {if or($attribute.content.person_user_exists,$admin)}
+    {def $admin=fetch( 'user', 'has_access_to', hash( 'module', 'xrowevent', 'function', 'admin' ) )
+         $participants_array=$attribute.content.participants
+         $participants_count=$participants_array|count}
     <div class="block">
         <div class="element">
             <strong>{$participants_count} {"participant(s)"|i18n("extension/xroweventmanager")}</strong><br />
@@ -63,4 +64,5 @@
     </div>
     <div class="break"></div>
     {/if}
+    *}
 {/if}

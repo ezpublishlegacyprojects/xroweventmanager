@@ -386,7 +386,7 @@ class xrowEventType extends eZDataType
     {
         switch ( $action )
         {
-            case 'add_myself':
+            case 'add_me':
             {
                 $userID = eZUser::currentUserID();
                 $eventObj = $contentObjectAttribute->content();
