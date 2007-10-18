@@ -36,6 +36,82 @@ else if ( $http->hasPostVariable( 'EventID' ) and $http->hasPostVariable( 'Remov
     else
         eZDebug::writeError( "Event doesn't exists: $eventID", "xrowevent - remove participant" );
 }
+else if ( $http->hasPostVariable( 'EventID' ) and $http->hasPostVariable( 'RemoveParticipantListButton' ) )
+{
+    $deleteIDArray = array();
+    if ( $http->hasPostVariable( 'DeleteIDArray' ) )
+        $deleteIDArray = $http->postVariable( 'DeleteIDArray' );
+        
+    $eventID = $http->postVariable( 'EventID' );
+    $event = xrowEvent::fetch( $eventID );
+    if ( is_object( $event ) )
+    {    
+        foreach( $deleteIDArray as $key => $item )
+        {
+            $event->removeParticipant( $item );
+        }
+    }
+    else
+        eZDebug::writeError( "Event doesn't exists: $eventID", "xrowevent - remove participants" );
+}
+else if ( $http->hasPostVariable( 'EventID' ) and $http->hasPostVariable( 'CancelEventButton' ) )
+{
+    $eventID = $http->postVariable( 'EventID' );
+    $event = xrowEvent::fetch( $eventID );
+    if ( is_object( $event ) )
+    {
+        $user =& eZUser::currentUser();
+        $isAdmin = $user->hasAccessTo( 'xrowevent', 'admin' );
+
+        if ( $isAdmin or $event->personUserExists() )
+        {
+            $event->setAttribute( 'status', XROW_EVENT_STATUS_EVENT_CANCELED );
+            $event->store();
+        }
+    }
+    else
+        eZDebug::writeError( "Event doesn't exists: $eventID", "xrowevent - change event status" );
+}
+else if ( $http->hasPostVariable( 'EventID' ) and $http->hasPostVariable( 'ActivateEventButton' ) )
+{
+    $eventID = $http->postVariable( 'EventID' );
+    $event = xrowEvent::fetch( $eventID );
+    if ( is_object( $event ) )
+    {
+        $user =& eZUser::currentUser();
+        $isAdmin = $user->hasAccessTo( 'xrowevent', 'admin' );
+
+        if ( $isAdmin or $event->personUserExists() )
+        {
+            if ( $event->attribute( 'max_participants' ) > $event->countParticipants() )
+                $event->setAttribute( 'status', XROW_EVENT_STATUS_PLACES_AVAILABLE );
+            else
+                $event->setAttribute( 'status', XROW_EVENT_STATUS_NO_PLACES );
+            
+            $event->store();
+        }
+    }
+    else
+        eZDebug::writeError( "Event doesn't exists: $eventID", "xrowevent - change event status" );
+}
+else if ( $http->hasPostVariable( 'EventID' ) and $http->hasPostVariable( 'EditEventButton' ) )
+{
+    $eventID = $http->postVariable( 'EventID' );
+    if ( $http->hasPostVariable( 'RedirectURIAfterPublish' ) )
+    {
+        $http->setSessionVariable( 'RedirectURIAfterPublish', $http->postVariable( 'RedirectURIAfterPublish' ) );
+    }
+    return $Module->redirect( 'content', 'edit', array( $eventID ) );
+}
+else if ( $http->hasPostVariable( 'EventID' ) and $http->hasPostVariable( 'ExportEventButton' ) )
+{
+    $eventID = $http->postVariable( 'EventID' );
+    if ( $http->hasPostVariable( 'RedirectURIAfterPublish' ) )
+    {
+        $http->setSessionVariable( 'RedirectURIAfterPublish', $http->postVariable( 'RedirectURIAfterPublish' ) );
+    }
+    return $Module->redirect( 'xrowevent', 'export', array( $eventID ) );
+}
 
 if ( $http->hasSessionVariable( "LastAccessesURI" ) )
     $redirectionURI = $http->sessionVariable( "LastAccessesURI" );

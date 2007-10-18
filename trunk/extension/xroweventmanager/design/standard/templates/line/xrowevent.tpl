@@ -6,8 +6,9 @@
 
     {if $node.data_map.xrowevent.has_content}
         <p>{$node.data_map.xrowevent.content.start_date|l10n(datetime)} - 
-           {$node.data_map.xrowevent.content.end_date|l10n(datetime)} - 
+           {$node.data_map.xrowevent.content.end_date|l10n(datetime)}
         </p>
+    {/if}
     </div>
     
     <div class="attribute-short">

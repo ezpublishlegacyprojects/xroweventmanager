@@ -52,10 +52,16 @@ class xrowEventPersons extends eZPersistentObject
     
     function countPersons( $eventID )
     {
-        $db =& eZDB::instance();
-        $sql = "SELECT COUNT(*) counter FROM xrowevent_persons WHERE event_id = '$eventID'";
-        $result = $db->arrayQuery( $sql );
-        return $result[0]['counter'];
+        $custom = array( array( 'operation' => 'count(*)',
+                                'name' => 'count' ) );
+        
+        $result = eZPersistentObject::fetchObjectList( xrowEventPersons::definition(),
+                                                       array(),
+                                                       array( 'event_id' => $eventID ),
+                                                       null, null, false, false, 
+                                                       $custom );
+                                                    
+        return $result[0]['count'];
     }
     
     function userObject()
@@ -85,45 +91,59 @@ class xrowEventPersons extends eZPersistentObject
     
     function userExists( $userID, $eventID )
     {
-        $db =& eZDB::instance();
-        $sql = "SELECT COUNT(*) counter FROM xrowevent_persons WHERE user_id = '$userID' AND event_id = '$eventID'";
-        $result = $db->arrayQuery( $sql );
-        if ( $result[0]['counter'] > 0 )
+        $custom = array( array( 'operation' => 'count(*)',
+                                'name' => 'count' ) );
+        
+        $result = eZPersistentObject::fetchObjectList( xrowEventPersons::definition(),
+                                                       array(),
+                                                       array( 'user_id' => $userID,
+                                                              'event_id' => $eventID ),
+                                                       null, null, false, false, 
+                                                       $custom );
+                                                    
+        if ( $result[0]['count'] > 0 )
             return true;
         else
             return false;
     }
     
+    function fetchUser( $userID, $eventID, $asObject = true )
+    {
+        return eZPersistentObject::fetchObject( xrowEventPersons::definition(),
+                                                null,
+                                                array( 'user_id' => $userID,
+                                                       'event_id' => $eventID ),
+                                                $asObject );
+    }
+    
     function addPerson( $userID, $eventID )
     {
-        $db =& eZDB::instance();
-        $sql = "SELECT * FROM xrowevent_persons WHERE user_id = '$userID' AND event_id = '$eventID'";
-        $result = $db->arrayQuery( $sql );
+        $person = xrowEventPersons::fetchUser( $userID, $eventID );
         
-        if ( count( $result ) == 0 )
+        if ( !is_object( $person ) )
         {
             $person = new xrowEventPersons( array( 'event_id' => $eventID, 
                                                    'user_id' => $userID ) );
             $person->store();   
         }
-        else
-            $person = new xrowEventPersons( $result[0] );
-
+        
         return $person;
     }
     
     function removePerson( $userID, $eventID )
     {
-        $db =& eZDB::instance();
-        $sql = "DELETE FROM xrowevent_persons WHERE event_id = '$eventID' AND user_id = '$userID'";
-        $db->query( $sql );  
+        $cond = array( 'user_id' => $userID, 'event_id' => $eventID );
+        
+        eZPersistentObject::removeObject( xrowEventPersons::definition(),
+                                          $cond );
     }
     
     function removeEvent( $eventID )
     {
-        $db =& eZDB::instance();
-        $sql = "DELETE FROM xrowevent_persons WHERE event_id = '$eventID'";
-        $db->query( $sql );
+        $cond = array( 'event_id' => $eventID );
+        
+        eZPersistentObject::removeObject( xrowEventPersons::definition(),
+                                          $cond );
     }
 }
 ?>

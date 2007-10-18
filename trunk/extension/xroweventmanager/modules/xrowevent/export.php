@@ -12,8 +12,6 @@ $ini =& eZINI::instance();
 
 $tpl =& templateInit();
 
-$offset = $Params['Offset'];
-
 $eventID = $Params['EventID'];
 
 $event = xrowEvent::fetch( $eventID );
@@ -23,21 +21,17 @@ if ( ( $event->personUserExists() or
      $user->hasAccessTo( 'xrowevent', 'admin' ) )
      and is_object( $event ) )
 {
-    $viewParameters = array( 'offset' => $offset );
-    $tpl->setVariable( 'view_parameters', $viewParameters );
     $tpl->setVariable( 'event_id', $eventID );
     $tpl->setVariable( 'event', $event );
-    $tpl->setVariable( 'participants_count', $event->countParticipants() );
-    $tpl->setVariable( 'person_count', $event->countPersons() );
     
     $path = array();
-    $path[] = array( 'text' => ezi18n( 'extension/xroweventmanager', 'Event details' ),
+    $path[] = array( 'text' => ezi18n( 'extension/xroweventmanager', 'Export event' ),
                      'url' => false );
     
     $Result = array();
     $Result['path'] =& $path;
     
-    $Result['content'] =& $tpl->fetch( 'design:xrowevent/event.tpl' );
+    $Result['content'] =& $tpl->fetch( 'design:xrowevent/export.tpl' );
 
 }
 else

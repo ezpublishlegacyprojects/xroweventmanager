@@ -55,7 +55,7 @@
     </div>
     *}
     <div class="break"></div>
-    {if $start_date|le($date)}
+    {if $start_date|gt($date)}
         {if $current_user.is_logged_in}
             <form action={"/xrowevent/action"|ezurl} method="post" name="xroweventform" id="xroweventform">
                 <input type="hidden" name="EventID" value="{$attribute.content.contentobject_id}" />

@@ -184,8 +184,10 @@ class xrowEvent extends eZPersistentObject
         xrowEventPersons::removeEvent( $contentObjectID );
         xrowEventParticipants::removeEvent( $contentObjectID );
         
-        $sql = "DELETE FROM xrowevent_event WHERE contentobject_id = '$contentObjectID'";
-        $db->query( $sql );
+        $cond = array( 'contentobject_id' => $contentObjectID );
+        
+        eZPersistentObject::removeObject( xrowEvent::definition(),
+                                          $cond );
         
         $db->commit();
     }
