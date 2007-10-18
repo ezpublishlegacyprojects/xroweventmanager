@@ -17,9 +17,9 @@ $offset = $Params['Offset'];
 $limit = 15;
 
 
-if( eZPreferences::value( 'admin_xrowevent_sortfield' ) )
+if( eZPreferences::value( 'admin_eventlist_sortfield' ) )
 {
-    $sortField = eZPreferences::value( 'admin_xrowevent_sortfield' );
+    $sortField = eZPreferences::value( 'admin_eventlist_sortfield' );
 }
 
 if ( !isset( $sortField ) || ( ( $sortField != 'start_date' ) && ( $sortField!= 'event_name' ) ) )
@@ -27,9 +27,9 @@ if ( !isset( $sortField ) || ( ( $sortField != 'start_date' ) && ( $sortField!= 
     $sortField = 'start_date';
 }
 
-if( eZPreferences::value( 'admin_xrowevent_sortorder' ) )
+if( eZPreferences::value( 'admin_eventlist_sortorder' ) )
 {
-    $sortOrder = eZPreferences::value( 'admin_xrowevent_sortorder' );
+    $sortOrder = eZPreferences::value( 'admin_eventlist_sortorder' );
 }
 
 if ( !isset( $sortOrder ) || ( ( $sortOrder != 'asc' ) && ( $sortOrder!= 'desc' ) ) )
