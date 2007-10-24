@@ -1,5 +1,6 @@
 {def $person_array=$attribute.content.persons
      $start_date=$attribute.content.start_date
+     $max_participants=$attribute.content.max_participants
 }
 {if $start_date|gt(0)}
     <div class="block">
@@ -16,13 +17,15 @@
         </div>
     </div>    
     <div class="break"></div>
+    {if $max_participants|gt(0)}
     <div class="block">    
         <div class="element">
             <strong>{"Max participants"|i18n("extension/xroweventmanager")}:</strong><br />
-            {$attribute.content.max_participants}
+            {$max_participants}
         </div>
     </div>    
     <div class="break"></div>
+    {/if}
     <div class="block">    
         <div class="element">
             <strong>{"Status"|i18n("extension/xroweventmanager")}:</strong><br />

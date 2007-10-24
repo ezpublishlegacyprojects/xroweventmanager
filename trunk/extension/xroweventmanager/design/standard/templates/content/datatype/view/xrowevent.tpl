@@ -24,6 +24,7 @@
         </div>
     </div>    
     <div class="break"></div>
+    {if $max_participants|gt(0)}
     <div class="block">    
         <div class="element">
             <strong>{"Max participants"|i18n("extension/xroweventmanager")}:</strong><br />
@@ -31,6 +32,7 @@
         </div>
     </div>    
     <div class="break"></div>
+    {/if}
     <div class="block">    
         <div class="element">
             <strong>{"Status"|i18n("extension/xroweventmanager")}:</strong><br />
@@ -58,20 +60,30 @@
         {if $current_user.is_logged_in}
             <form action={"/xrowevent/action"|ezurl} method="post" name="xroweventform" id="xroweventform">
                 <input type="hidden" name="EventID" value="{$attribute.content.contentobject_id}" />
-            {if $participants_count|lt($max_participants)}
+            {if $max_participants|gt(0)}
+                {if $participants_count|lt($max_participants)}
+                    {if $attribute.content.participant_user_exists|not}
+                        <p>{"You are able to join this event."|i18n("extension/xroweventmanager")}</p>
+                        <input class="button" type="submit" name="AddParticipant" value="{'Join event'|i18n( 'extension/xroweventmanager' )}" />
+                    {else}
+                        <p>{"You have already joined this event."|i18n("extension/xroweventmanager")}</p>
+                        <input class="button" type="submit" name="RemoveParticipant" value="{'Cancel participation'|i18n( 'extension/xroweventmanager' )}" />
+                    {/if}
+                {else}
+                    {if $attribute.content.participant_user_exists}
+                    <p>{"You have already joined this event."|i18n("extension/xroweventmanager")}</p>
+                        <input class="button" type="submit" name="RemoveParticipant" value="{'Cancel participation'|i18n( 'extension/xroweventmanager' )}" />
+                    {else}
+                        <p>{"Maximum number of participants reached."|i18n("extension/xroweventmanager")}</p>
+                    {/if}
+                {/if}
+            {else}
                 {if $attribute.content.participant_user_exists|not}
                     <p>{"You are able to join this event."|i18n("extension/xroweventmanager")}</p>
                     <input class="button" type="submit" name="AddParticipant" value="{'Join event'|i18n( 'extension/xroweventmanager' )}" />
                 {else}
                     <p>{"You have already joined this event."|i18n("extension/xroweventmanager")}</p>
                     <input class="button" type="submit" name="RemoveParticipant" value="{'Cancel participation'|i18n( 'extension/xroweventmanager' )}" />
-                {/if}
-            {else}
-                {if $attribute.content.participant_user_exists}
-                <p>{"You have already joined this event."|i18n("extension/xroweventmanager")}</p>
-                    <input class="button" type="submit" name="RemoveParticipant" value="{'Cancel participation'|i18n( 'extension/xroweventmanager' )}" />
-                {else}
-                    <p>{"Maximum number of participants reached."|i18n("extension/xroweventmanager")}</p>
                 {/if}
             {/if}
             </form>

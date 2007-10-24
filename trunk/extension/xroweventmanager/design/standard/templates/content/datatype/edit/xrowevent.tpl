@@ -5,7 +5,7 @@
 	 $eyear=sum($date|datetime(custom,"%Y"),10)
 	 $start_timestamp=first_set( $attribute.content.start_date, $date )
 	 $end_timestamp=first_set( $attribute.content.end_date, sum($date,3600) )
-	 $max_participants=first_set( $attribute.content.max_participants, 1 )
+	 $max_participants=first_set( $attribute.content.max_participants, 0 )
 	 $status=first_set( $attribute.content.status, 1 )
 	 $status_array=$attribute.content.status_array
 	 $person_array=$attribute.content.persons
@@ -45,7 +45,7 @@
 <div class="block">
     <div class="element">
         <label>{"Year"|i18n("extension/xroweventmanager")}</label><div class="labelbreak"></div>
-        <select name="{$attribute_base}_xrowevent_start_year_{$attribute.id}" title="{"Please enter the  year"|i18n("extension/xroweventmanager")}">
+        <select name="{$attribute_base}_xrowevent_start_year_{$attribute.id}" title="{"Please enter the year"|i18n("extension/xroweventmanager")}">
             <option value=""></option>
         {for $syear to $eyear as $i}
              <option value="{$i}"{if eq($start_year,$i)} selected="selected"{/if}>{$i}</option>
@@ -153,7 +153,7 @@
     <div class="element">
         <label>{"Max. participants"|i18n("extension/xroweventmanager")}</label><div class="labelbreak"></div>
         
-        <input id="ezcoa-{if ne( $attribute_base, 'ContentObjectAttribute' )}{$attribute_base}-{/if}{$attribute.contentclassattribute_id}_{$attribute.contentclass_attribute_identifier}" class="box ezcc-{$attribute.object.content_class.identifier} ezcca-{$attribute.object.content_class.identifier}_{$attribute.contentclass_attribute_identifier}" type="text" name="{$attribute_base}_xrowevent_max_participants_{$attribute.id}" size="10" value="{$max_participants}" />
+        <input id="ezcoa-{if ne( $attribute_base, 'ContentObjectAttribute' )}{$attribute_base}-{/if}{$attribute.contentclassattribute_id}_{$attribute.contentclass_attribute_identifier}" class="box ezcc-{$attribute.object.content_class.identifier} ezcca-{$attribute.object.content_class.identifier}_{$attribute.contentclass_attribute_identifier}" type="text" name="{$attribute_base}_xrowevent_max_participants_{$attribute.id}" size="10" value="{$max_participants|wash}" />
         
     </div>
     
@@ -161,7 +161,7 @@
         <label>{"Status"|i18n("extension/xroweventmanager")}</label><div class="labelbreak"></div>
         <select name="{$attribute_base}_xrowevent_status_{$attribute.id}" title="{"Please enter the max. participants."|i18n("extension/xroweventmanager")}">
         {foreach $status_array as $key => $status_name}
-            {if and($key|eq(1),$participants_array|count|ge($max_participants))}
+            {if and($key|eq(1),$max_participants|gt(0),$participants_array|count|ge($max_participants))}
                 <option value="{$key}" disabled="disabled">{$status|wash}</option>
             {else}
                 <option value="{$key}"{if eq($status,$key)} selected="selected"{/if}>{$status_name|wash}</option>

@@ -21,8 +21,13 @@ $user =& eZUser::currentUser();
 
 if ( is_object( $event ) )
 {
+    $isAdminArray = $user->hasAccessTo( 'xrowevent', 'admin' );
+    if ( $isAdminArray['accessWord'] != 'no' )
+        $isAdmin = true;
+    else
+        $isAdmin = false;
     if ( ( $event->personUserExists() or
-         $user->hasAccessTo( 'xrowevent', 'admin' ) )
+           $isAdmin )
          and is_object( $event ) )
     {
         $viewParameters = array( 'offset' => $offset );

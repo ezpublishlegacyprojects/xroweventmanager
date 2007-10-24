@@ -17,9 +17,15 @@ $eventID = $Params['EventID'];
 $event = xrowEvent::fetch( $eventID );
 $user =& eZUser::currentUser();
 
+$isAdminArray = $user->hasAccessTo( 'xrowevent', 'admin' );
+if ( $isAdminArray['accessWord'] != 'no' )
+    $isAdmin = true;
+else
+    $isAdmin = false;
+
 if ( ( $event->personUserExists() or
-     $user->hasAccessTo( 'xrowevent', 'admin' ) )
-     and is_object( $event ) )
+       $isAdmin )
+      and is_object( $event ) )
 {
     $tpl->setVariable( 'event_id', $eventID );
     $tpl->setVariable( 'event', $event );

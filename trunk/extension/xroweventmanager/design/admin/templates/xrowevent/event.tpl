@@ -3,6 +3,7 @@
                                                                       'offset', $offset,
                                                                       'limit', $page_limit,
                                                                       'sort_array', array( array( 'created', 'desc' ) ) ) )
+    $max_participants=$event.max_participants
 }
 
 <form action={concat( 'xrowevent/action' )|ezurl} method="post" name="xrowevent" id="xrowevent">
@@ -37,13 +38,15 @@
     </div>
 </div>    
 <div class="break"></div>
+{if $max_participants|gt(0)}
 <div class="block">    
     <div class="element">
         <strong>{"Max participants"|i18n("extension/xroweventmanager")}:</strong><br />
-        {$event.max_participants|wash}
+        {$max_participants|wash}
     </div>
-</div>    
+</div>
 <div class="break"></div>
+{/if}
 <div class="block">    
     <div class="element">
         <strong>{"Status"|i18n("extension/xroweventmanager")}:</strong><br />

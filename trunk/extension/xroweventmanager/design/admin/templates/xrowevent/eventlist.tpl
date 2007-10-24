@@ -57,7 +57,7 @@
 	<td nowrap="nowrap">{if $event.start_date|gt(0)}{$event.start_date|l10n( shortdatetime )}{else}&nbsp;{/if}</td>
 	<td nowrap="nowrap">{if $event.end_date|gt(0)}{$event.end_date|l10n( shortdatetime )}{else}&nbsp;{/if}</td>
 	<td class="number" align="right">{$event.person_count}</td>
-	<td class="number" align="right">{$event.participants_count} ({$event.max_participants})</td>
+	<td class="number" align="right">{$event.participants_count}{if $event.max_participants|gt(0)} ({$event.max_participants}){/if}</td>
 </tr>
 {/foreach}
 </table>

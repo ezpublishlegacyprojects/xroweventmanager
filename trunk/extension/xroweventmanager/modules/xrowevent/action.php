@@ -36,7 +36,13 @@ else if ( $http->hasPostVariable( 'EventID' ) and $http->hasPostVariable( 'Remov
             $newUserID = $http->postVariable( 'UserID' );
             if ( $userID != $newUserID )
             {
-                if ( $user->hasAccessTo( 'xrowevent', 'admin' ) or
+                $isAdminArray = $user->hasAccessTo( 'xrowevent', 'admin' );
+                if ( $isAdminArray['accessWord'] != 'no' )
+                    $isAdmin = true;
+                else
+                    $isAdmin = false;
+                    
+                if ( $isAdmin or
                      $event->personUserExists() )
                 {
                     $userID = $newUserID;
@@ -65,7 +71,11 @@ else if ( $http->hasPostVariable( 'EventID' ) and $http->hasPostVariable( 'Remov
     
     
     $user =& eZUser::currentUser();
-    $isAdmin = $user->hasAccessTo( 'xrowevent', 'admin' );
+    $isAdminArray = $user->hasAccessTo( 'xrowevent', 'admin' );
+    if ( $isAdminArray['accessWord'] != 'no' )
+        $isAdmin = true;
+    else
+        $isAdmin = false;
 
     if ( $isAdmin or $event->personUserExists() )
     {
@@ -88,7 +98,11 @@ else if ( $http->hasPostVariable( 'EventID' ) and $http->hasPostVariable( 'Cance
     if ( is_object( $event ) )
     {
         $user =& eZUser::currentUser();
-        $isAdmin = $user->hasAccessTo( 'xrowevent', 'admin' );
+        $isAdminArray = $user->hasAccessTo( 'xrowevent', 'admin' );
+        if ( $isAdminArray['accessWord'] != 'no' )
+            $isAdmin = true;
+        else
+            $isAdmin = false;
 
         if ( $isAdmin or $event->personUserExists() )
         {
@@ -106,7 +120,11 @@ else if ( $http->hasPostVariable( 'EventID' ) and $http->hasPostVariable( 'Activ
     if ( is_object( $event ) )
     {
         $user =& eZUser::currentUser();
-        $isAdmin = $user->hasAccessTo( 'xrowevent', 'admin' );
+        $isAdminArray = $user->hasAccessTo( 'xrowevent', 'admin' );
+        if ( $isAdminArray['accessWord'] != 'no' )
+            $isAdmin = true;
+        else
+            $isAdmin = false;
 
         if ( $isAdmin or $event->personUserExists() )
         {

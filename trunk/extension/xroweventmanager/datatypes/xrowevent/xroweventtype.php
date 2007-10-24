@@ -88,18 +88,37 @@ class xrowEventType extends eZDataType
             $endCheck = true;
         }
         
-        if ( !is_numeric( $maxparticipants ) )
+        if ( $maxparticipants != "" and $maxparticipants != 0 )
         {
-            $contentObjectAttribute->setValidationError( ezi18n( 'extension/xroweventmanager',
-                                                                 'Enter a number at the max. member field.' ) );
-            return EZ_INPUT_VALIDATOR_STATE_INVALID;
-        }
-        
-        if ( $maxparticipants < 1 )
-        {
-            $contentObjectAttribute->setValidationError( ezi18n( 'extension/xroweventmanager',
-                                                                 'The max. member number must be greater than 0.' ) );
-            return EZ_INPUT_VALIDATOR_STATE_INVALID;
+            if ( !is_numeric( $maxparticipants ) )
+            {
+                $contentObjectAttribute->setValidationError( ezi18n( 'extension/xroweventmanager',
+                                                                     'Enter a number at the max. member field.' ) );
+                return EZ_INPUT_VALIDATOR_STATE_INVALID;
+            }
+            
+            if ( $maxparticipants < 0 )
+            {
+                $contentObjectAttribute->setValidationError( ezi18n( 'extension/xroweventmanager',
+                                                                     'The max. member number must not be lower than 0.' ) );
+                return EZ_INPUT_VALIDATOR_STATE_INVALID;
+            }
+            
+            $contentObjectID = $contentObjectAttribute->attribute( "contentobject_id" );
+            $participantCount = xrowEventParticipants::countParticipants( $contentObjectID );
+            if ( $participantCount > $maxparticipants and $status != XROW_EVENT_STATUS_EVENT_CANCELED )
+            {
+                $contentObjectAttribute->setValidationError( ezi18n( 'extension/xroweventmanager',
+                                                                      "The number of participants who have already joined this event is higher than the number of the max. participants. 
+                                                                       Increase the maximum number or delete participants from the event." ) );
+                return EZ_INPUT_VALIDATOR_STATE_INVALID;
+            }
+            else if ( $participantCount == $maxparticipants and $status == XROW_EVENT_STATUS_PLACES_AVAILABLE )
+            {
+                $contentObjectAttribute->setValidationError( ezi18n( 'extension/xroweventmanager',
+                                                                      "This event has already reached the maximum number of participants. Please change the status of the event." ) );
+                return EZ_INPUT_VALIDATOR_STATE_INVALID;
+            }
         }
         
         if ( $status !== null )
@@ -128,22 +147,6 @@ class xrowEventType extends eZDataType
                                                                      "The event ends before it starts. Please correct the end date of the event." ) );
                 return EZ_INPUT_VALIDATOR_STATE_INVALID;
             }
-        }
-        
-        $contentObjectID = $contentObjectAttribute->attribute( "contentobject_id" );
-        $participantCount = xrowEventParticipants::countParticipants( $contentObjectID );
-        if ( $participantCount > $maxparticipants and $status != XROW_EVENT_STATUS_EVENT_CANCELED )
-        {
-            $contentObjectAttribute->setValidationError( ezi18n( 'extension/xroweventmanager',
-                                                                  "The number of participants who have already joined this event is higher than the number of the max. participants. 
-                                                                   Increase the maximum number or delete participants from the event." ) );
-            return EZ_INPUT_VALIDATOR_STATE_INVALID;
-        }
-        else if ( $participantCount == $maxparticipants and $status == XROW_EVENT_STATUS_PLACES_AVAILABLE )
-        {
-            $contentObjectAttribute->setValidationError( ezi18n( 'extension/xroweventmanager',
-                                                                  "This event has already reached the maximum number of participants. Please change the status of the event." ) );
-            return EZ_INPUT_VALIDATOR_STATE_INVALID;
         }
         
         return EZ_INPUT_VALIDATOR_STATE_ACCEPTED;
@@ -180,7 +183,9 @@ class xrowEventType extends eZDataType
             $endhour   = $http->postVariable( $base . '_xrowevent_end_hour_' . $contentObjectAttribute->attribute( 'id' ) );
             $endminute = $http->postVariable( $base . '_xrowevent_end_minute_' . $contentObjectAttribute->attribute( 'id' ) );
             
-            $maxparticipants = $http->postVariable( $base . '_xrowevent_max_participants_' . $contentObjectAttribute->attribute( 'id' ) );
+            $maxparticipants = trim( $http->postVariable( $base . '_xrowevent_max_participants_' . $contentObjectAttribute->attribute( 'id' ) ) );
+            if ( $maxparticipants == '' )
+                $maxparticipants = 0;
             
             $status = null;
             if ( $http->hasPostVariable( $base . '_xrowevent_status_' . $contentObjectAttribute->attribute( 'id' ) ) )
@@ -237,7 +242,9 @@ class xrowEventType extends eZDataType
             $endhour   = $http->postVariable( $base . '_xrowevent_end_hour_' . $contentObjectAttribute->attribute( 'id' ) );
             $endminute = $http->postVariable( $base . '_xrowevent_end_minute_' . $contentObjectAttribute->attribute( 'id' ) );
             
-            $maxParticipants = $http->postVariable( $base . '_xrowevent_max_participants_' . $contentObjectAttribute->attribute( 'id' ) );
+            $maxParticipants = trim( $http->postVariable( $base . '_xrowevent_max_participants_' . $contentObjectAttribute->attribute( 'id' ) ) );
+            if ( $maxParticipants == '' )
+                $maxParticipants = 0;
             
             $data = array();
             
@@ -320,7 +327,7 @@ class xrowEventType extends eZDataType
                                                   'start_date' => 0,
                                                   'end_date' => 0,
                                                   'status' => XROW_EVENT_STATUS_DRAFT,
-                                                  'max_participants' => 1 ) );
+                                                  'max_participants' => 0 ) );
             $GLOBALS['xrowEventManagerCache'][$contentObjectAttribute->ContentObjectID][$contentObjectAttribute->Version] = $eventObj;
             return $eventObj;
         }

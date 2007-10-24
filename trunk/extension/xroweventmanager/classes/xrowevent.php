@@ -120,37 +120,49 @@ class xrowEvent extends eZPersistentObject
     {
         $participantCount = $this->countParticipants();
         $maxParticipants = $this->attribute( 'max_participants' );
-        if ( $participantCount < $maxParticipants )
+        
+        if ( $maxParticipants > 0 )
         {
-            $result = xrowEventParticipants::addParticipant( $userID, $this->attribute( 'contentobject_id' ) );
-            // no dupe check before
-            $participantCount = $this->countParticipants();
-            if ( $participantCount == $maxParticipants )
+            if ( $participantCount < $maxParticipants )
             {
-                $this->setAttribute( 'status', XROW_EVENT_STATUS_NO_PLACES );
-                $this->store();
+                $result = xrowEventParticipants::addParticipant( $userID, $this->attribute( 'contentobject_id' ) );
+                // no dupe check before
+                $participantCount = $this->countParticipants();
+                if ( $participantCount == $maxParticipants )
+                {
+                    $this->setAttribute( 'status', XROW_EVENT_STATUS_NO_PLACES );
+                    $this->store();
+                }
+                return $result;
             }
-            return $result;
+            else
+                eZDebug::writeError( 'Max. amount of participant already reached', 'xrowEvent::addParticipant()' );
         }
         else
-            eZDebug::writeError( 'Max. amount of participant already reached', 'xrowEvent::addParticipant()' );
-        
+        {
+            return xrowEventParticipants::addParticipant( $userID, $this->attribute( 'contentobject_id' ) );
+        }
         return false;
     }
     
     function removeParticipant( $userID )
     {
         xrowEventParticipants::removeParticipant( $userID, $this->attribute( 'contentobject_id' ) );
-        $participantCount = $this->countParticipants();
-        $status = $this->attribute( 'status' );
-        if ( $status == XROW_EVENT_STATUS_NO_PLACES )
+
+        $maxParticipants = $this->attribute( 'max_participants' );
+
+        if ( $maxParticipants > 0 )
         {
-            $maxParticipants = $this->attribute( 'max_participants' );
-            if ( $participantCount < $maxParticipants )
+            $participantCount = $this->countParticipants();
+            $status = $this->attribute( 'status' );
+            if ( $status == XROW_EVENT_STATUS_NO_PLACES )
             {
-                $status = XROW_EVENT_STATUS_PLACES_AVAILABLE;
-                $this->setAttribute( 'status', $status );
-                $this->store();
+                if ( $participantCount < $maxParticipants )
+                {
+                    $status = XROW_EVENT_STATUS_PLACES_AVAILABLE;
+                    $this->setAttribute( 'status', $status );
+                    $this->store();
+                }
             }
         }
     }
@@ -211,8 +223,17 @@ class xrowEvent extends eZPersistentObject
     {
         $user =& eZUser::currentUser();
         $userID = $user->id();
-        $isAdmin = $user->hasAccessTo( 'xrowevent', 'admin' );
-        $isManager = $user->hasAccessTo( 'xrowevent', 'manage' );
+        $isAdminArray = $user->hasAccessTo( 'xrowevent', 'admin' );
+        if ( $isAdminArray['accessWord'] != 'no' )
+            $isAdmin = true;
+        else
+            $isAdmin = false;
+            
+        $isManagerArray = $user->hasAccessTo( 'xrowevent', 'manage' );
+        if ( $isManagerArray['accessWord'] != 'no' )
+            $isManager = true;
+        else
+            $isManager = false;    
         
         if ( !$isAdmin and !$isManager )
             return array();
@@ -276,8 +297,17 @@ class xrowEvent extends eZPersistentObject
     {
         $user =& eZUser::currentUser();
         $userID = $user->id();
-        $isAdmin = $user->hasAccessTo( 'xrowevent', 'admin' );
-        $isManager = $user->hasAccessTo( 'xrowevent', 'manage' );
+        $isAdminArray = $user->hasAccessTo( 'xrowevent', 'admin' );
+        if ( $isAdminArray['accessWord'] != 'no' )
+            $isAdmin = true;
+        else
+            $isAdmin = false;
+            
+        $isManagerArray = $user->hasAccessTo( 'xrowevent', 'manage' );
+        if ( $isManagerArray['accessWord'] != 'no' )
+            $isManager = true;
+        else
+            $isManager = false;
         
         if ( !$isAdmin and !$isManager )
             return 0;
