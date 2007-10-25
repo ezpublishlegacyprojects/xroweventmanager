@@ -2,5 +2,6 @@
 
 [ModuleSettings]
 ExtensionRepositories[]=xroweventmanager
+ModuleList[]=xrowevent
 
 */ ?>
