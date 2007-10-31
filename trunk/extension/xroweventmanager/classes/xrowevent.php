@@ -100,7 +100,16 @@ class xrowEvent extends eZPersistentObject
     {
         return xrowEventParticipants::fetchParticipants( $this->attribute( 'contentobject_id' ), true );
     }
-    
+    function fetchParticipantsObjectIDArray()
+    {
+        $return = array();
+        $list = xrowEventParticipants::fetchParticipants( $this->attribute( 'contentobject_id' ), true );
+        foreach ( $list as $item )
+        {
+            $return[] = $item->attribute( 'user_id' );
+        }
+        return $return;
+    }
     function fetchPersons()
     {
         return xrowEventPersons::fetchPersons( $this->attribute( 'contentobject_id' ), true );

@@ -27,17 +27,9 @@ if ( ( $event->personUserExists() or
        $isAdmin )
       and is_object( $event ) )
 {
-    $tpl->setVariable( 'event_id', $eventID );
-    $tpl->setVariable( 'event', $event );
+    $_SESSION['EXTRACTCSV_OBJECTID_ARRAY'] = $event->fetchParticipantsObjectIDArray();
     
-    $path = array();
-    $path[] = array( 'text' => ezi18n( 'extension/xroweventmanager', 'Export event' ),
-                     'url' => false );
-    
-    $Result = array();
-    $Result['path'] =& $path;
-    
-    $Result['content'] =& $tpl->fetch( 'design:xrowevent/export.tpl' );
+    $Module->redirectTo( 'extract/csv' );
 
 }
 else
