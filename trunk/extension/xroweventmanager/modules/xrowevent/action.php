@@ -16,11 +16,17 @@ if ( $http->hasPostVariable( 'EventID' ) and $http->hasPostVariable( 'AddPartici
 {
     if ( $http->hasPostVariable( 'UserID' ) )
         $userID = $http->postVariable( 'UserID' );
-        
+
     $eventID = $http->postVariable( 'EventID' );
     $event = xrowEvent::fetch( $eventID );
+
     if ( is_object( $event ) )
-        $event->addParticipant( $userID );
+    {
+        if ( $event->attribute( 'comment' ) == 0 )
+            $event->addParticipant( $userID );
+        else
+            return $Module->redirectToView( 'event_comment', array( $eventID ) );
+    }
     else
         eZDebug::writeError( "Event doesn't exists: $eventID", "xrowevent - add participant" );
 }
@@ -41,7 +47,7 @@ else if ( $http->hasPostVariable( 'EventID' ) and $http->hasPostVariable( 'Remov
                     $isAdmin = true;
                 else
                     $isAdmin = false;
-                    
+
                 if ( $isAdmin or
                      $event->personUserExists() )
                 {
@@ -54,7 +60,7 @@ else if ( $http->hasPostVariable( 'EventID' ) and $http->hasPostVariable( 'Remov
         }
         else
             $isAllowed = true;
-        
+
         if ( $isAllowed )
             $event->removeParticipant( $userID );
     }
@@ -66,10 +72,10 @@ else if ( $http->hasPostVariable( 'EventID' ) and $http->hasPostVariable( 'Remov
     $deleteIDArray = array();
     if ( $http->hasPostVariable( 'DeleteIDArray' ) )
         $deleteIDArray = $http->postVariable( 'DeleteIDArray' );
-        
+
     $eventID = $http->postVariable( 'EventID' );
-    
-    
+
+
     $user =& eZUser::currentUser();
     $isAdminArray = $user->hasAccessTo( 'xrowevent', 'admin' );
     if ( $isAdminArray['accessWord'] != 'no' )
@@ -81,7 +87,7 @@ else if ( $http->hasPostVariable( 'EventID' ) and $http->hasPostVariable( 'Remov
     {
         $event = xrowEvent::fetch( $eventID );
         if ( is_object( $event ) )
-        {    
+        {
             foreach( $deleteIDArray as $key => $item )
             {
                 $event->removeParticipant( $item );
@@ -132,7 +138,7 @@ else if ( $http->hasPostVariable( 'EventID' ) and $http->hasPostVariable( 'Activ
                 $event->setAttribute( 'status', XROW_EVENT_STATUS_PLACES_AVAILABLE );
             else
                 $event->setAttribute( 'status', XROW_EVENT_STATUS_NO_PLACES );
-            
+
             $event->store();
         }
     }
@@ -165,12 +171,12 @@ else if ( $http->hasPostVariable( 'EventID' ) and $http->hasPostVariable( 'Expor
 
 if ( $http->hasSessionVariable( "LastAccessesURI" ) )
     $redirectionURI = $http->sessionVariable( "LastAccessesURI" );
-    
+
 $haveRedirectionURI = ( $redirectionURI != '' && $redirectionURI != '/' );
 
 if ( !$haveRedirectionURI )
     $redirectionURI = $ini->variable( 'SiteSettings', 'DefaultPage' );
-    
+
 return $Module->redirectTo( $redirectionURI );
 
 ?>

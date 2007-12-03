@@ -37,16 +37,17 @@ if ( is_object( $event ) )
         $tpl->setVariable( 'participants_count', $event->countParticipants() );
         $tpl->setVariable( 'person_count', $event->countPersons() );
         $tpl->setVariable( 'offset', $offset );
-        
+
         $path = array();
         $path[] = array( 'text' => ezi18n( 'extension/xroweventmanager', 'Event details' ),
                          'url' => false );
-        
+
         $Result = array();
         $Result['path'] =& $path;
-        
+
         $Result['content'] =& $tpl->fetch( 'design:xrowevent/event.tpl' );
-    
+        $Result['left_menu'] = 'design:parts/xroweventmanager/menu.tpl';
+
     }
     else
     {

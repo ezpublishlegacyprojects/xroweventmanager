@@ -10,6 +10,7 @@
 	 $status_array=$attribute.content.status_array
 	 $person_array=$attribute.content.persons
 	 $participants_array=$attribute.content.participants
+	 $comment=$attribute.content.comment
 }
 {if $start_timestamp|eq(0)}
     {def $start_year=""
@@ -41,7 +42,7 @@
     	 $end_min=$end_timestamp|datetime(custom,"%i")
     }
 {/if}
-<p><strong>{"Start"|i18n("extension/xroweventmanager")}:</strong></p>	 
+<p><strong>{"Start"|i18n("extension/xroweventmanager")}:</strong></p>
 <div class="block">
     <div class="element">
         <label>{"Year"|i18n("extension/xroweventmanager")}</label><div class="labelbreak"></div>
@@ -72,7 +73,7 @@
         {/for}
         </select>
     </div>
-    
+
     <div class="element">
         <label>{"Hour"|i18n("extension/xroweventmanager")}</label><div class="labelbreak"></div>
         <select name="{$attribute_base}_xrowevent_start_hour_{$attribute.id}" title="{"Please enter the hour"|i18n("extension/xroweventmanager")}">
@@ -82,7 +83,7 @@
         {/for}
         </select>
     </div>
-    
+
     <div class="element">
         <label>{"Minute"|i18n("extension/xroweventmanager")}</label><div class="labelbreak"></div>
         <select name="{$attribute_base}_xrowevent_start_minute_{$attribute.id}" title="{"Please enter the minute"|i18n("extension/xroweventmanager")}">
@@ -94,7 +95,7 @@
     </div>
 </div>
 <div class="break"></div>
-<p><strong>{"End"|i18n("extension/xroweventmanager")}:</strong></p>	 
+<p><strong>{"End"|i18n("extension/xroweventmanager")}:</strong></p>
 <div class="block">
     <div class="element">
         <label>{"Year"|i18n("extension/xroweventmanager")}</label><div class="labelbreak"></div>
@@ -125,7 +126,7 @@
         {/for}
         </select>
     </div>
-    
+
     <div class="element">
         <label>{"Hour"|i18n("extension/xroweventmanager")}</label><div class="labelbreak"></div>
         <select name="{$attribute_base}_xrowevent_end_hour_{$attribute.id}" title="{"Please enter the hour"|i18n("extension/xroweventmanager")}">
@@ -135,7 +136,7 @@
         {/for}
         </select>
     </div>
-    
+
     <div class="element">
         <label>{"Minute"|i18n("extension/xroweventmanager")}</label><div class="labelbreak"></div>
         <select name="{$attribute_base}_xrowevent_end_minute_{$attribute.id}" title="{"Please enter the minute"|i18n("extension/xroweventmanager")}">
@@ -152,11 +153,11 @@
 <div class="block">
     <div class="element">
         <label>{"Max. participants"|i18n("extension/xroweventmanager")}</label><div class="labelbreak"></div>
-        
+
         <input id="ezcoa-{if ne( $attribute_base, 'ContentObjectAttribute' )}{$attribute_base}-{/if}{$attribute.contentclassattribute_id}_{$attribute.contentclass_attribute_identifier}" class="box ezcc-{$attribute.object.content_class.identifier} ezcca-{$attribute.object.content_class.identifier}_{$attribute.contentclass_attribute_identifier}" type="text" name="{$attribute_base}_xrowevent_max_participants_{$attribute.id}" size="10" value="{$max_participants|wash}" />
-        
+
     </div>
-    
+
     <div class="element">
         <label>{"Status"|i18n("extension/xroweventmanager")}</label><div class="labelbreak"></div>
         <select name="{$attribute_base}_xrowevent_status_{$attribute.id}" title="{"Please enter the max. participants."|i18n("extension/xroweventmanager")}">
@@ -171,7 +172,12 @@
     </div>
 </div>
 <div class="break"></div>
-
+<div class="block">
+    <div class="element">
+        <label><input type="checkbox" value="1" name="{$attribute_base}_xrowevent_comment_{$attribute.id}" {if $comment}checked="checked" {/if}/>
+        {"Allow comments from participants"|i18n("extension/xroweventmanager")}</label><div class="labelbreak"></div>
+    </div>
+</div>
 <div class="block">
     <div class="element">
         <label>{"Persons"|i18n("extension/xroweventmanager")}</label><div class="labelbreak"></div>
@@ -185,6 +191,7 @@
         {/if}
     </div>
 </div>
+
 <div class="break"></div>
 <div class="buttonblock">
 {if $person_array|count|gt(0)}

@@ -11,7 +11,7 @@ class xrowEventParticipants extends eZPersistentObject
 	{
 		$this->eZPersistentObject( $row );
 	}
-	
+
 	function definition()
     {
         return array( 'fields' => array( "event_id" => array( 'name' => "EventID",
@@ -31,10 +31,14 @@ class xrowEventParticipants extends eZPersistentObject
                                          'created' => array( 'name' => 'created',
                                                         'datatype' => 'ingeger',
                                                         'default' => 0,
-                                                        'required' => true ),               
+                                                        'required' => true ),
+                                        'comment' => array( 'name' => 'comment',
+                                                        'datatype' => 'string',
+                                                        'default' => '',
+                                                        'required' => false ),
                                           ),
-                                                             
-                      'keys' => array( 'contentobject_id' ),
+
+                      'keys' => array( 'event_id' ),
                       'function_attributes' => array( 'user_object' => 'userObject',
                                                       'event_object' => 'eventObject' ),
                       'class_name' => 'xrowEventParticipants',
@@ -45,39 +49,39 @@ class xrowEventParticipants extends eZPersistentObject
                       'name' => 'xrowevent_participants'
                       );
     }
-    
+
     function userObject()
     {
         $userID = $this->attribute( 'user_id' );
         return eZContentObject::fetch( $userID );
     }
-    
+
     function eventObject()
     {
         $eventID = $this->attribute( 'event_id' );
         return eZContentObject::fetch( $eventID );
     }
-    
+
     function countParticipants( $eventID )
     {
         $custom = array( array( 'operation' => 'count(*)',
                                 'name' => 'count' ) );
-        
+
         $result = eZPersistentObject::fetchObjectList( xrowEventParticipants::definition(),
                                                        array(),
                                                        array( 'event_id' => $eventID ),
-                                                       null, null, false, false, 
+                                                       null, null, false, false,
                                                        $custom );
-                                                    
+
         return $result[0]['count'];
     }
-    
+
     function fetchParticipants( $eventID, $asObject = true, $offset = 0, $limit = false, $sortArray = array() )
     {
         $limitArray = null;
         if ( $limit > 0 )
             $limitArray = array( 'offset' => $offset, 'length' => $limit );
-        
+
         $sorts = array( 'created' => 'asc' );
         if ( count( $sortArray ) > 0 )
         {
@@ -87,7 +91,7 @@ class xrowEventParticipants extends eZPersistentObject
                 $sorts[ $sortItem[0] ] = $sortItem[1];
             }
         }
-        
+
         return eZPersistentObject::fetchObjectList( xrowEventParticipants::definition(),
                                                     null,
                                                     array( 'event_id' => $eventID ),
@@ -95,19 +99,19 @@ class xrowEventParticipants extends eZPersistentObject
                                                     $limitArray,
                                                     $asObject );
     }
-    
+
     function fetchEvents( $userID, $asObject = true )
     {
         if ( !$userID )
             $userID = eZUser::currentUserID();
-        
+
         return eZPersistentObject::fetchObjectList( xrowEventParticipants::definition(),
                                                     null,
                                                     array( 'user_id' => $userID ),
                                                     null, null,
                                                     $asObject );
     }
-    
+
     function fetchUser( $userID, $eventID, $asObject = true )
     {
         return eZPersistentObject::fetchObject( xrowEventParticipants::definition(),
@@ -116,55 +120,57 @@ class xrowEventParticipants extends eZPersistentObject
                                                        'event_id' => $eventID ),
                                                 $asObject );
     }
-    
-    function addParticipant( $userID, $eventID, $created = false )
+
+    function addParticipant( $userID, $eventID, $created = false, $comment = '' )
     {
         $participant = xrowEventParticipants::fetchUser( $userID, $eventID );
-        
+
         if ( !is_object( $participant ) )
         {
             if ( !$created )
             {
                 $dateTime = new eZDateTime();
                 $created = $dateTime->timeStamp();
-            }  
-            $participant = new xrowEventParticipants( array( 'event_id' => $eventID, 
-                                                             'user_id' => $userID, 
-                                                             'created' => $created ) );
-            $participant->store();   
+            }
+
+            $participant = new xrowEventParticipants( array( 'event_id' => $eventID,
+                                                             'user_id' => $userID,
+                                                             'created' => $created,
+                                                             'comment' => $comment ) );
+            $participant->store();
         }
-        
+
         return $participant;
     }
-    
+
     function removeParticipant( $userID, $eventID )
     {
         $cond = array( 'user_id' => $userID, 'event_id' => $eventID );
-        
+
         eZPersistentObject::removeObject( xrowEventParticipants::definition(),
                                           $cond );
     }
-    
+
     function removeEvent( $eventID )
     {
         $cond = array( 'event_id' => $eventID );
-        
+
         eZPersistentObject::removeObject( xrowEventParticipants::definition(),
                                           $cond );
     }
-    
+
     function userExists( $userID, $eventID )
     {
         $custom = array( array( 'operation' => 'count(*)',
                                 'name' => 'count' ) );
-        
+
         $result = eZPersistentObject::fetchObjectList( xrowEventParticipants::definition(),
                                                        array(),
                                                        array( 'user_id' => $userID,
                                                               'event_id' => $eventID ),
-                                                       null, null, false, false, 
+                                                       null, null, false, false,
                                                        $custom );
-                                                    
+
         if ( $result[0]['count'] > 0 )
             return true;
         else

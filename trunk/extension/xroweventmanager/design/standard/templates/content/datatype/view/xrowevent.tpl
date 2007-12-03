@@ -7,7 +7,7 @@
      $max_participants=$attribute.content.max_participants
      $start_date=$attribute.content.start_date
      $date=currentdate()
-     $admin=fetch( 'user', 'has_access_to', hash( 'module', 'xrowevent', 
+     $admin=fetch( 'user', 'has_access_to', hash( 'module', 'xrowevent',
                                                   'function', 'admin' ) )}
 {if $start_date|gt(0)}
     <div class="block">
@@ -15,31 +15,32 @@
             <strong>{"Start"|i18n("extension/xroweventmanager")}:</strong><br />
             {$start_date|l10n(datetime)}
         </div>
-    </div>    
+    </div>
     <div class="break"></div>
     <div class="block">
         <div class="element">
             <strong>{"End"|i18n("extension/xroweventmanager")}:</strong><br />
             {$attribute.content.end_date|l10n(datetime)}
         </div>
-    </div>    
+    </div>
     <div class="break"></div>
     {if $max_participants|gt(0)}
-    <div class="block">    
+    <div class="block">
         <div class="element">
             <strong>{"Max participants"|i18n("extension/xroweventmanager")}:</strong><br />
             {$max_participants|wash}
         </div>
-    </div>    
+    </div>
     <div class="break"></div>
     {/if}
-    <div class="block">    
+    <div class="block">
         <div class="element">
             <strong>{"Status"|i18n("extension/xroweventmanager")}:</strong><br />
             {$attribute.content.status_text|wash}
         </div>
     </div>
     <div class="break"></div>
+
     {* This functionality should be only accessable over the backend's event tab.
        We leave it in here if one might still need it.
     <div class="block">
@@ -108,13 +109,13 @@
                     <input class="button" type="submit" name="RegisterButton" id="RegisterButton" value="{'Register new user'|i18n('design/ezwebin/user/login','Button')}" tabindex="1" />
                  </div>
             </div>
-            <input name="RedirectURI" type="hidden" value="{$attribute.object.main_node.url_alias}" /> 
-            </form>       
+            <input name="RedirectURI" type="hidden" value="{$attribute.object.main_node.url_alias}" />
+            </form>
         {/if}
     {else}
         <p>{"Event subscription has ended. A subscription isn't possible anymore."|i18n("extension/xroweventmanager")}</p>
     {/if}
-    
+
     {* Show all participants to all event persons *}
     {*
     {if or($attribute.content.person_user_exists,$admin)}

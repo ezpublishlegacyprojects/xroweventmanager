@@ -21,3 +21,6 @@ CREATE TABLE `xrowevent_persons` (
   KEY `event_id` (`event_id`),
   KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+# update
+ALTER TABLE xrowevent_participants ADD COLUMN `comment` TEXT AFTER `created`;

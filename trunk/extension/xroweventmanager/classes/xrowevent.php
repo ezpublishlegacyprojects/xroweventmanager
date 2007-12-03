@@ -16,7 +16,7 @@ class xrowEvent extends eZPersistentObject
 	{
 		$this->eZPersistentObject( $row );
 	}
-	
+
 	function definition()
     {
         return array( 'fields' => array( 'start_date' => array( 'name' => 'StartDate',
@@ -30,11 +30,11 @@ class xrowEvent extends eZPersistentObject
                                          'max_participants' => array( 'name' => 'MaxParticipants',
                                                         'datatype' => 'ingeger',
                                                         'default' => 1,
-                                                        'required' => true ),               
+                                                        'required' => true ),
                                          'status' => array( 'name' => 'Status',
                                                         'datatype' => 'ingeger',
                                                         'default' => 0,
-                                                        'required' => true ),               
+                                                        'required' => true ),
                                          "contentobject_id" => array( 'name' => "ContentObjectID",
                                                                       'datatype' => 'integer',
                                                                       'default' => 0,
@@ -42,8 +42,12 @@ class xrowEvent extends eZPersistentObject
                                                                       'foreign_class' => 'eZContentObject',
                                                                       'foreign_attribute' => 'id',
                                                                       'multiplicity' => '1..*' ),
+                                         'comment' => array( 'name' => 'Comment',
+                                                        'datatype' => 'ingeger',
+                                                        'default' => 0,
+                                                        'required' => false ),
                                           ),
-                                                             
+
                       'keys' => array( 'contentobject_id' ),
                       'function_attributes' => array( 'participants' => 'fetchParticipants',
                                                       'participants_count' => 'countParticipants',
@@ -60,34 +64,34 @@ class xrowEvent extends eZPersistentObject
                       'sort' => array( 'start_date' => 'asc' ),
                       'name' => 'xrowevent_event' );
     }
-    
+
     function personUserExists()
     {
         $userID = eZUser::currentUserID();
         return xrowEventPersons::userExists( $userID, $this->attribute( 'contentobject_id' ) );
     }
-    
+
     function participantUserExists()
     {
         $userID = eZUser::currentUserID();
         return xrowEventParticipants::userExists( $userID, $this->attribute( 'contentobject_id' ) );
     }
-    
+
     function eventLength()
     {
         return $this->attribute( 'end_date' ) - $this->attribute( 'start_date' );
     }
-    
+
     function countParticipants()
     {
         return xrowEventParticipants::countParticipants( $this->attribute( 'contentobject_id' ) );
     }
-    
+
     function countPersons()
     {
         return xrowEventPersons::countPersons( $this->attribute( 'contentobject_id' ) );
     }
-    
+
     function fetch( $contentObjectID, $asObject = true )
     {
         return eZPersistentObject::fetchObject( xrowEvent::definition(),
@@ -95,7 +99,7 @@ class xrowEvent extends eZPersistentObject
                                                 array( 'contentobject_id' => $contentObjectID ),
                                                 $asObject );
     }
-    
+
     function fetchParticipants()
     {
         return xrowEventParticipants::fetchParticipants( $this->attribute( 'contentobject_id' ), true );
@@ -114,27 +118,27 @@ class xrowEvent extends eZPersistentObject
     {
         return xrowEventPersons::fetchPersons( $this->attribute( 'contentobject_id' ), true );
     }
-    
+
     function addPerson( $userID )
     {
         return xrowEventPersons::addPerson( $userID, $this->attribute( 'contentobject_id' ) );
     }
-    
+
     function removePerson( $userID )
     {
         xrowEventPersons::removePerson( $userID, $this->attribute( 'contentobject_id' ) );
     }
-    
-    function addParticipant( $userID )
+
+    function addParticipant( $userID, $comment = '' )
     {
         $participantCount = $this->countParticipants();
         $maxParticipants = $this->attribute( 'max_participants' );
-        
+
         if ( $maxParticipants > 0 )
         {
             if ( $participantCount < $maxParticipants )
             {
-                $result = xrowEventParticipants::addParticipant( $userID, $this->attribute( 'contentobject_id' ) );
+                $result = xrowEventParticipants::addParticipant( $userID, $this->attribute( 'contentobject_id' ), false, $comment );
                 // no dupe check before
                 $participantCount = $this->countParticipants();
                 if ( $participantCount == $maxParticipants )
@@ -145,15 +149,15 @@ class xrowEvent extends eZPersistentObject
                 return $result;
             }
             else
-                eZDebug::writeError( 'Max. amount of participant already reached', 'xrowEvent::addParticipant()' );
+                eZDebug::writeError( 'Max. amount of participants already reached', 'xrowEvent::addParticipant()' );
         }
         else
         {
-            return xrowEventParticipants::addParticipant( $userID, $this->attribute( 'contentobject_id' ) );
+            return xrowEventParticipants::addParticipant( $userID, $this->attribute( 'contentobject_id' ), false, $comment );
         }
         return false;
     }
-    
+
     function removeParticipant( $userID )
     {
         xrowEventParticipants::removeParticipant( $userID, $this->attribute( 'contentobject_id' ) );
@@ -175,7 +179,7 @@ class xrowEvent extends eZPersistentObject
             }
         }
     }
-    
+
     function saveEvent( $data )
     {
         $event = xrowEvent::fetch( $data['contentobject_id'] );
@@ -189,45 +193,46 @@ class xrowEvent extends eZPersistentObject
             $event->setAttribute( 'end_date', $data['end_date'] );
             $event->setAttribute( 'max_participants', $data['max_participants'] );
             $event->setAttribute( 'status', $data['status'] );
+            $event->setAttribute( 'comment', $data['comment'] );
         }
-        
+
         $event->store();
         return $event;
     }
-    
+
     function removeEvent( $contentObjectID = false )
     {
         if ( !$contentObjectID )
             $contentObjectID = $this->attribute( 'contentobject_id' );
-        
+
         $db =& eZDB::instance();
         $db->begin();
         xrowEventPersons::removeEvent( $contentObjectID );
         xrowEventParticipants::removeEvent( $contentObjectID );
-        
+
         $cond = array( 'contentobject_id' => $contentObjectID );
-        
+
         eZPersistentObject::removeObject( xrowEvent::definition(),
                                           $cond );
-        
+
         $db->commit();
     }
-    
+
     function statusArray()
     {
         return array( XROW_EVENT_STATUS_PLACES_AVAILABLE => ezi18n( 'extension/xroweventmanager', "Places available" ),
                       XROW_EVENT_STATUS_NO_PLACES => ezi18n( 'extension/xroweventmanager', "No places available" ),
-                      XROW_EVENT_STATUS_EVENT_CANCELED => ezi18n( 'extension/xroweventmanager', "Event canceled" ) 
+                      XROW_EVENT_STATUS_EVENT_CANCELED => ezi18n( 'extension/xroweventmanager', "Event canceled" )
                      );
     }
-    
+
     function statusText()
     {
         $statusArray = $this->statusArray();
         $status = $this->attribute( 'status' );
         return $statusArray[$status];
     }
-    
+
     function fetchEvents( $asObject, $offset, $limit, $sortField, $sortOrder )
     {
         $user =& eZUser::currentUser();
@@ -237,27 +242,27 @@ class xrowEvent extends eZPersistentObject
             $isAdmin = true;
         else
             $isAdmin = false;
-            
+
         $isManagerArray = $user->hasAccessTo( 'xrowevent', 'manage' );
         if ( $isManagerArray['accessWord'] != 'no' )
             $isManager = true;
         else
-            $isManager = false;    
-        
+            $isManager = false;
+
         if ( !$isAdmin and !$isManager )
             return array();
-            
+
         if ( $sortField == 'start_date' )
             $sortFieldSql = 'a.start_date';
-        else 
+        else
             $sortFieldSql = 'c.name';
-            
+
         $db =& eZDB::instance();
         if ( !$isAdmin )
         {
-            $sql = "SELECT 
+            $sql = "SELECT
                         a.*
-                    FROM 
+                    FROM
                         xrowevent_event a,
                         xrowevent_persons b,
                         ezcontentobject c
@@ -271,11 +276,11 @@ class xrowEvent extends eZPersistentObject
                         $sortFieldSql $sortOrder
                     ";
         }
-        else 
+        else
         {
-             $sql = "SELECT 
+             $sql = "SELECT
                         a.*
-                    FROM 
+                    FROM
                         xrowevent_event a,
                         ezcontentobject c
                     WHERE
@@ -286,9 +291,9 @@ class xrowEvent extends eZPersistentObject
                         $sortFieldSql $sortOrder
                     ";
         }
-        
+
         $result = $db->arrayQuery( $sql, array( 'offset' => $offset, 'limit' => $limit ) );
-        
+
         $eventArray = array();
         if ( $asObject )
         {
@@ -301,7 +306,7 @@ class xrowEvent extends eZPersistentObject
         else
             return $result;
     }
-    
+
     function eventCount()
     {
         $user =& eZUser::currentUser();
@@ -311,22 +316,22 @@ class xrowEvent extends eZPersistentObject
             $isAdmin = true;
         else
             $isAdmin = false;
-            
+
         $isManagerArray = $user->hasAccessTo( 'xrowevent', 'manage' );
         if ( $isManagerArray['accessWord'] != 'no' )
             $isManager = true;
         else
             $isManager = false;
-        
+
         if ( !$isAdmin and !$isManager )
             return 0;
-            
+
         $db =& eZDB::instance();
         if ( !$isAdmin )
         {
-            $sql = "SELECT 
+            $sql = "SELECT
                         COUNT(*) counter
-                    FROM 
+                    FROM
                         xrowevent_event a,
                         xrowevent_persons b,
                         ezcontentobject c
@@ -338,11 +343,11 @@ class xrowEvent extends eZPersistentObject
                         c.status = 1
                     ";
         }
-        else 
+        else
         {
-             $sql = "SELECT 
+             $sql = "SELECT
                         COUNT(*) counter
-                    FROM 
+                    FROM
                         xrowevent_event a,
                         ezcontentobject c
                     WHERE
@@ -351,15 +356,15 @@ class xrowEvent extends eZPersistentObject
                         c.status = 1
                     ";
         }
-        
+
         $result = $db->arrayQuery( $sql );
-        
+
         return $result[0]['counter'];
     }
-    
+
     function eventObject()
     {
-        $coID = $this->attribute( 'contentobject_id' );      
+        $coID = $this->attribute( 'contentobject_id' );
         return eZContentObject::fetch( $coID );
     }
 }

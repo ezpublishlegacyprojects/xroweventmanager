@@ -57,6 +57,7 @@ $Result = array();
 $Result['path'] =& $path;
 
 $Result['content'] =& $tpl->fetch( 'design:xrowevent/eventlist.tpl' );
+$Result['left_menu'] = 'design:parts/xroweventmanager/menu.tpl';
 
 
 ?>

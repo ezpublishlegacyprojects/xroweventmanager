@@ -8,30 +8,39 @@
             <strong>{"Start"|i18n("extension/xroweventmanager")}:</strong><br />
             {$start_date|l10n(datetime)}
         </div>
-    </div>    
+    </div>
     <div class="break"></div>
     <div class="block">
         <div class="element">
             <strong>{"End"|i18n("extension/xroweventmanager")}:</strong><br />
             {$attribute.content.end_date|l10n(datetime)}
         </div>
-    </div>    
+    </div>
     <div class="break"></div>
     {if $max_participants|gt(0)}
-    <div class="block">    
+    <div class="block">
         <div class="element">
             <strong>{"Max participants"|i18n("extension/xroweventmanager")}:</strong><br />
             {$max_participants}
         </div>
-    </div>    
+    </div>
     <div class="break"></div>
     {/if}
-    <div class="block">    
+    <div class="block">
         <div class="element">
             <strong>{"Status"|i18n("extension/xroweventmanager")}:</strong><br />
             {$attribute.content.status_text|wash}
         </div>
     </div>
+    <div class="break"></div>
+
+    <div class="block">
+        <div class="element">
+            <strong>{"Comments allowed"|i18n("extension/xroweventmanager")}:</strong><br />
+            {if $attribute.content.comment|eq(1)}{"Yes"|i18n("extension/xroweventmanager")}{else}{"No"|i18n("extension/xroweventmanager")}{/if}
+        </div>
+    </div>
+
     <div class="break"></div>
     <div class="block">
         <div class="element">

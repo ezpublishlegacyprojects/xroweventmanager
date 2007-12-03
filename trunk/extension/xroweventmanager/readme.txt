@@ -8,7 +8,7 @@ Installation:
 -) Activate extension
 -) Clear caches
 -) Add the xrowevent datatype to a content class
--) There are two policies for using this module:
+-) There are three policies for using this module:
    -) use: Users are allowed to use this module, they can e.g. join events
    -) manage: Users are allowed to manage the events
    -) administrate: admin rights, see all events
@@ -18,3 +18,9 @@ Restrictions:
 ---------------------------------------------
 -) No version control of the event data
 -) No translations possible
+
+xrow EventManager, 1.1
+---------------------------------------------
+-) Participants can leave a comment before the join an event (table update required, see sql/xroweventmanager.sql)
+-) Added left menu
+-) Addes example event manager class in packages/event_manager-1.0-1.ezpkg

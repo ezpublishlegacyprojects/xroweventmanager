@@ -17,28 +17,29 @@ class xrowEventType extends eZDataType
 {
     function xrowEventType()
     {
-        $this->eZDataType( EZ_DATATYPESTRING_XROWEVENT, 
+        $this->eZDataType( EZ_DATATYPESTRING_XROWEVENT,
                            ezi18n( 'extension/xroweventmanager', "xrow Event", 'Datatype name' ),
                            array( 'serialize_supported' => false,
                                   'translation_allowed' => false ) );
 
     }
-    
+
     /*!
      Private method only for use inside this class
     */
-    function validateEventHTTPInput( $startday, 
-                                     $startmonth, 
-                                     $startyear, 
-                                     $starthour, 
-                                     $startminute, 
-                                     $endday, 
-                                     $endmonth, 
-                                     $endyear, 
-                                     $endhour, 
+    function validateEventHTTPInput( $startday,
+                                     $startmonth,
+                                     $startyear,
+                                     $starthour,
+                                     $startminute,
+                                     $endday,
+                                     $endmonth,
+                                     $endyear,
+                                     $endhour,
                                      $endminute,
                                      $maxparticipants,
                                      $status,
+                                     $comment,
                                      &$contentObjectAttribute )
     {
         include_once( 'lib/ezutils/classes/ezdatetimevalidator.php' );
@@ -56,7 +57,7 @@ class xrowEventType extends eZDataType
                                                                      'Start date is not valid.' ) );
                 return EZ_INPUT_VALIDATOR_STATE_INVALID;
             }
-            
+
             $state = eZDateTimeValidator::validateTime( $starthour, $startminute );
             if ( $state == EZ_INPUT_VALIDATOR_STATE_INVALID )
             {
@@ -66,7 +67,7 @@ class xrowEventType extends eZDataType
             }
             $startCheck = true;
         }
-        
+
         if ( !( $endyear == '' and $endmonth == ''and $endday == '' and
                 $endhour == '' and $endminute == '' ) )
         {
@@ -77,7 +78,7 @@ class xrowEventType extends eZDataType
                                                                      'end date is not valid.' ) );
                 return EZ_INPUT_VALIDATOR_STATE_INVALID;
             }
-    
+
             $state = eZDateTimeValidator::validateTime( $endhour, $endminute );
             if ( $state == EZ_INPUT_VALIDATOR_STATE_INVALID )
             {
@@ -87,7 +88,7 @@ class xrowEventType extends eZDataType
             }
             $endCheck = true;
         }
-        
+
         if ( $maxparticipants != "" and $maxparticipants != 0 )
         {
             if ( !is_numeric( $maxparticipants ) )
@@ -96,20 +97,20 @@ class xrowEventType extends eZDataType
                                                                      'Enter a number at the max. member field.' ) );
                 return EZ_INPUT_VALIDATOR_STATE_INVALID;
             }
-            
+
             if ( $maxparticipants < 0 )
             {
                 $contentObjectAttribute->setValidationError( ezi18n( 'extension/xroweventmanager',
                                                                      'The max. member number must not be lower than 0.' ) );
                 return EZ_INPUT_VALIDATOR_STATE_INVALID;
             }
-            
+
             $contentObjectID = $contentObjectAttribute->attribute( "contentobject_id" );
             $participantCount = xrowEventParticipants::countParticipants( $contentObjectID );
             if ( $participantCount > $maxparticipants and $status != XROW_EVENT_STATUS_EVENT_CANCELED )
             {
                 $contentObjectAttribute->setValidationError( ezi18n( 'extension/xroweventmanager',
-                                                                      "The number of participants who have already joined this event is higher than the number of the max. participants. 
+                                                                      "The number of participants who have already joined this event is higher than the number of the max. participants.
                                                                        Increase the maximum number or delete participants from the event." ) );
                 return EZ_INPUT_VALIDATOR_STATE_INVALID;
             }
@@ -120,7 +121,7 @@ class xrowEventType extends eZDataType
                 return EZ_INPUT_VALIDATOR_STATE_INVALID;
             }
         }
-        
+
         if ( $status !== null )
         {
             if ( $status < 1 or $status > 3 )
@@ -130,17 +131,17 @@ class xrowEventType extends eZDataType
                 return EZ_INPUT_VALIDATOR_STATE_INVALID;
             }
         }
-        
+
         if ( $startCheck and $endCheck )
         {
             $startDateTime = new eZDateTime();
             $startDateTime->setMDYHMS( $startmonth, $startday, $startyear, $starthour, $startminute, 0 );
             $startTimeStamp = $startDateTime->timeStamp();
-            
+
             $endDateTime = new eZDateTime();
             $endDateTime->setMDYHMS( $endmonth, $endday, $endyear, $endhour, $endminute, 0 );
             $endTimeStamp = $endDateTime->timeStamp();
-            
+
             if ( $endTimeStamp <= $startTimeStamp )
             {
                 $contentObjectAttribute->setValidationError( ezi18n( 'extension/xroweventmanager',
@@ -148,10 +149,10 @@ class xrowEventType extends eZDataType
                 return EZ_INPUT_VALIDATOR_STATE_INVALID;
             }
         }
-        
+
         return EZ_INPUT_VALIDATOR_STATE_ACCEPTED;
     }
-    
+
     /*!
      Validates the input and returns true if the input was
      valid for this datatype.
@@ -176,42 +177,47 @@ class xrowEventType extends eZDataType
             $startday    = $http->postVariable( $base . '_xrowevent_start_day_' . $contentObjectAttribute->attribute( 'id' ) );
             $starthour   = $http->postVariable( $base . '_xrowevent_start_hour_' . $contentObjectAttribute->attribute( 'id' ) );
             $startminute = $http->postVariable( $base . '_xrowevent_start_minute_' . $contentObjectAttribute->attribute( 'id' ) );
-            
+
             $endyear   = $http->postVariable( $base . '_xrowevent_end_year_' . $contentObjectAttribute->attribute( 'id' ) );
             $endmonth  = $http->postVariable( $base . '_xrowevent_end_month_' . $contentObjectAttribute->attribute( 'id' ) );
             $endday    = $http->postVariable( $base . '_xrowevent_end_day_' . $contentObjectAttribute->attribute( 'id' ) );
             $endhour   = $http->postVariable( $base . '_xrowevent_end_hour_' . $contentObjectAttribute->attribute( 'id' ) );
             $endminute = $http->postVariable( $base . '_xrowevent_end_minute_' . $contentObjectAttribute->attribute( 'id' ) );
-            
+
             $maxparticipants = trim( $http->postVariable( $base . '_xrowevent_max_participants_' . $contentObjectAttribute->attribute( 'id' ) ) );
             if ( $maxparticipants == '' )
                 $maxparticipants = 0;
-            
+
             $status = null;
             if ( $http->hasPostVariable( $base . '_xrowevent_status_' . $contentObjectAttribute->attribute( 'id' ) ) )
                 $status = $http->postVariable( $base . '_xrowevent_status_' . $contentObjectAttribute->attribute( 'id' ) );
-            
+
+            $comment = 0;
+            if ( $http->hasPostVariable( $base . '_xrowevent_comment_' . $contentObjectAttribute->attribute( 'id' ) ) )
+                $comment = 1;
+
             $classAttribute =& $contentObjectAttribute->contentClassAttribute();
 
-            return $this->validateEventHTTPInput( $startday, 
-                                                  $startmonth, 
-                                                  $startyear, 
-                                                  $starthour, 
-                                                  $startminute, 
-                                                  $endday, 
-                                                  $endmonth, 
-                                                  $endyear, 
-                                                  $endhour, 
+            return $this->validateEventHTTPInput( $startday,
+                                                  $startmonth,
+                                                  $startyear,
+                                                  $starthour,
+                                                  $startminute,
+                                                  $endday,
+                                                  $endmonth,
+                                                  $endyear,
+                                                  $endhour,
                                                   $endminute,
                                                   $maxparticipants,
                                                   $status,
+                                                  $comment,
                                                   $contentObjectAttribute );
-                
+
         }
         else
             return EZ_INPUT_VALIDATOR_STATE_ACCEPTED;
     }
-    
+
     /*!
      Fetches the http post var integer input and stores it in the data instance.
     */
@@ -226,7 +232,7 @@ class xrowEventType extends eZDataType
              $http->hasPostVariable( $base . '_xrowevent_end_month_' . $contentObjectAttribute->attribute( 'id' ) ) and
              $http->hasPostVariable( $base . '_xrowevent_end_day_' . $contentObjectAttribute->attribute( 'id' ) ) and
              $http->hasPostVariable( $base . '_xrowevent_end_hour_' . $contentObjectAttribute->attribute( 'id' ) ) and
-             $http->hasPostVariable( $base . '_xrowevent_end_minute_' . $contentObjectAttribute->attribute( 'id' ) ) and 
+             $http->hasPostVariable( $base . '_xrowevent_end_minute_' . $contentObjectAttribute->attribute( 'id' ) ) and
              $http->hasPostVariable( $base . '_xrowevent_max_participants_' . $contentObjectAttribute->attribute( 'id' ) )
         )
         {
@@ -235,27 +241,31 @@ class xrowEventType extends eZDataType
             $startday    = $http->postVariable( $base . '_xrowevent_start_day_' . $contentObjectAttribute->attribute( 'id' ) );
             $starthour   = $http->postVariable( $base . '_xrowevent_start_hour_' . $contentObjectAttribute->attribute( 'id' ) );
             $startminute = $http->postVariable( $base . '_xrowevent_start_minute_' . $contentObjectAttribute->attribute( 'id' ) );
-            
+
             $endyear   = $http->postVariable( $base . '_xrowevent_end_year_' . $contentObjectAttribute->attribute( 'id' ) );
             $endmonth  = $http->postVariable( $base . '_xrowevent_end_month_' . $contentObjectAttribute->attribute( 'id' ) );
             $endday    = $http->postVariable( $base . '_xrowevent_end_day_' . $contentObjectAttribute->attribute( 'id' ) );
             $endhour   = $http->postVariable( $base . '_xrowevent_end_hour_' . $contentObjectAttribute->attribute( 'id' ) );
             $endminute = $http->postVariable( $base . '_xrowevent_end_minute_' . $contentObjectAttribute->attribute( 'id' ) );
-            
+
             $maxParticipants = trim( $http->postVariable( $base . '_xrowevent_max_participants_' . $contentObjectAttribute->attribute( 'id' ) ) );
             if ( $maxParticipants == '' )
                 $maxParticipants = 0;
-            
+
             $data = array();
-            
+
+            $data['comment'] = 0;
+            if ( $http->hasPostVariable( $base . '_xrowevent_comment_' . $contentObjectAttribute->attribute( 'id' ) ) )
+                $data['comment'] = 1;
+
             if ( $http->hasPostVariable( $base . '_xrowevent_status_' . $contentObjectAttribute->attribute( 'id' ) ) )
                 $data['status'] = $http->postVariable( $base . '_xrowevent_status_' . $contentObjectAttribute->attribute( 'id' ) );
             else
                 $data['status'] = XROW_EVENT_STATUS_PLACES_AVAILABLE;
-                                    
+
             if ( ( $startyear == '' and $startmonth == ''and $startday == '' and
                    $starthour == '' and $startminute == '' ) or
-                 !checkdate( $startmonth, $startday, $startyear ) or $startyear < 1970 )
+                   !checkdate( $startmonth, $startday, $startyear ) or $startyear < 1970 )
             {
                 $data['start_date'] = 0;
             }
@@ -265,10 +275,10 @@ class xrowEventType extends eZDataType
                 $startDateTime->setMDYHMS( $startmonth, $startday, $startyear, $starthour, $startminute, 0 );
                 $data['start_date'] = $startDateTime->timeStamp();
             }
-            
+
             if ( ( $endyear == '' and $endmonth == ''and $endday == '' and
                    $endhour == '' and $endminute == '' ) or
-                 !checkdate( $endmonth, $endday, $endyear ) or $endyear < 1970 )
+                   !checkdate( $endmonth, $endday, $endyear ) or $endyear < 1970 )
             {
                 $data['end_date'] = 0;
             }
@@ -278,27 +288,27 @@ class xrowEventType extends eZDataType
                 $endDateTime->setMDYHMS( $endmonth, $endday, $endyear, $endhour, $endminute, 0 );
                 $data['end_date'] = $endDateTime->timeStamp();
             }
-            
+
             $data['max_participants'] = $maxParticipants;
-            
+
             $data['contentobject_id'] = $contentObjectAttribute->attribute( 'contentobject_id' );
-            
+
             $event = xrowEvent::saveEvent( $data );
-            
+
             // to enable an easy content fetch of events which are in the future
             $contentObjectAttribute->setAttribute( 'data_int', $data['start_date'] );
             $contentObjectAttribute->store();
-            
+
             return true;
         }
         return false;
     }
-    
+
     function hasObjectAttributeContent( &$contentObjectAttribute )
     {
         $eventID = $contentObjectAttribute->attribute( 'contentobject_id' );
         $event = xrowEvent::fetch( $eventID );
-        
+
         if ( is_object( $event ) )
         {
             if ( $event->attribute( 'start_date' ) > 0 )
@@ -309,7 +319,7 @@ class xrowEventType extends eZDataType
         else
             return false;
     }
-    
+
     /*!
      Returns the content.
     */
@@ -321,7 +331,7 @@ class xrowEventType extends eZDataType
         {
             $eventID = $contentObjectAttribute->attribute( 'contentobject_id' );
             $eventObj = xrowEvent::fetch( $eventID );
-            
+
             if ( !is_object( $eventObj ) )
                 $eventObj = new xrowEvent( array( 'contentobject_id' => $eventID,
                                                   'start_date' => 0,
@@ -332,7 +342,7 @@ class xrowEventType extends eZDataType
             return $eventObj;
         }
     }
-    
+
     function storeObjectAttribute( &$contentObjectAttribute )
     {
         if ( isset( $GLOBALS['xrowEventManagerCache'][$contentObjectAttribute->ContentObjectID][$contentObjectAttribute->Version] ) )
@@ -354,7 +364,7 @@ class xrowEventType extends eZDataType
     {
         return false;
     }
-    
+
     /*!
      \reimp
     */
@@ -385,7 +395,7 @@ class xrowEventType extends eZDataType
         }
         return "";
     }
-    
+
     /*!
      \reimp
     */
@@ -400,14 +410,14 @@ class xrowEventType extends eZDataType
                 if ( is_object( $eventObj ) )
                     $eventObj->addPerson( $userID );
                 $this->storeObjectAttribute( $contentObjectAttribute );
-                    
+
             }break;
-            
+
             case 'add_persons':
             {
                 $module =& $parameters['module'];
                 $redirectionURI = $parameters['current-redirection-uri'];
-    
+
                 include_once( 'kernel/classes/ezcontentbrowse.php' );
                 $browseParameters = array( 'action_name' => 'BrowsePersonList',
                                            'description_template' => 'design:content/browse_add_persons.tpl',
@@ -417,9 +427,9 @@ class xrowEventType extends eZDataType
                                            'from_page' => $redirectionURI );
                 eZContentBrowse::browse( $browseParameters,
                                          $module );
-                    
+
             }break;
-            
+
             case 'set_person_list':
             {
                 if ( !$http->hasPostVariable( 'BrowseCancelButton' ) )
@@ -430,12 +440,12 @@ class xrowEventType extends eZDataType
                     {
                         $personArray = $eventObj->attribute( 'persons' );
                         $personIDArray = array();
-                        
+
                         foreach( $personArray as $key => $item )
                         {
-                            $personIDArray[] = $item->attribute( 'user_id' );   
+                            $personIDArray[] = $item->attribute( 'user_id' );
                         }
-                        
+
                         foreach ( $selectedObjectIDArray as $objectID )
                         {
                             // Check if the given object ID has a numeric value, if not go to the next object.
@@ -443,37 +453,37 @@ class xrowEventType extends eZDataType
                             {
                                 eZDebug::writeError( "Related object ID (objectID): '$objectID', is not a numeric value.",
                                     "xrowEventType::customObjectAttributeHTTPAction" );
-        
+
                                 continue;
                             }
-        
+
                            if ( !in_array( $objectID, $personIDArray ) )
                                 $eventObj->addPerson( $objectID );
                         }
                         $this->storeObjectAttribute( $contentObjectAttribute );
                     }
                 }
-                
+
             }break;
-            
+
             case 'remove_persons':
             {
                 if ( $http->hasPostVariable( 'xrowevent_person_array_' . $contentObjectAttribute->attribute( 'id' ) ) )
                 {
                     $personArray = $http->postVariable( 'xrowevent_person_array_' . $contentObjectAttribute->attribute( 'id' ) );
-                    
+
                     $eventObj = $contentObjectAttribute->content();
-                    
+
                     foreach( $personArray as $id => $person )
                     {
-                        $eventObj->removePerson( $person );   
+                        $eventObj->removePerson( $person );
                     }
-                    
+
                     $this->storeObjectAttribute( $contentObjectAttribute );
                 }
-                
+
             }break;
-            
+
             default:
             {
                  eZDebug::writeError( "Unknown custom HTTP action: " . $action,
@@ -481,7 +491,7 @@ class xrowEventType extends eZDataType
             }break;
         }
     }
-    
+
     /*!
      \reimp
     */
@@ -498,7 +508,7 @@ class xrowEventType extends eZDataType
             xrowEvent::removeEvent( $contentObjectID );
         }
     }
-    
+
     /*!
      \reimp
     */

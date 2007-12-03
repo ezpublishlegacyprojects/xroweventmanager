@@ -24,6 +24,13 @@ $ViewList['event'] = array(
     "unordered_params" => array( "offset" => "Offset" ),
     "params" => array( 'eventid' => 'EventID' ) );
 
+$ViewList['event_comment'] = array(
+    'script' => 'event_comment.php',
+    'functions' => array( 'use' ),
+    'default_navigation_part' => 'xroweventmanager',
+    'ui_context' => 'content',
+    "params" => array( 'eventid' => 'EventID' ) );
+
 $ViewList['export'] = array(
     'script' => 'export.php',
     'functions' => array( 'manage' ),
