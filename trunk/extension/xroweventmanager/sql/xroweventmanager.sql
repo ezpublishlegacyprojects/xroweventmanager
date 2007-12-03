@@ -23,4 +23,5 @@ CREATE TABLE `xrowevent_persons` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 # update
+ALTER TABLE xrowevent_event ADD COLUMN `comment` INTEGER NOT NULL DEFAULT 0 AFTER `contentobject_id`;
 ALTER TABLE xrowevent_participants ADD COLUMN `comment` TEXT AFTER `created`;
