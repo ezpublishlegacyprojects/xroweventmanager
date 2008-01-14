@@ -11,7 +11,7 @@ class xrowEventPersons extends eZPersistentObject
 		$this->eZPersistentObject( $row );
 	}
 	
-	function definition()
+	static function definition()
     {
         return array( 'fields' => array( "event_id" => array( 'name' => "EventID",
                                                                       'datatype' => 'integer',
@@ -40,7 +40,7 @@ class xrowEventPersons extends eZPersistentObject
                       'name' => 'xrowevent_persons' );
     }
     
-    function fetchPersons( $eventID, $asObject = true )
+    static function fetchPersons( $eventID, $asObject = true )
     {
         return eZPersistentObject::fetchObjectList( xrowEventPersons::definition(),
                                                     null,
@@ -50,7 +50,7 @@ class xrowEventPersons extends eZPersistentObject
                                                     $asObject );
     }
     
-    function countPersons( $eventID )
+    static function countPersons( $eventID )
     {
         $custom = array( array( 'operation' => 'count(*)',
                                 'name' => 'count' ) );
@@ -89,7 +89,7 @@ class xrowEventPersons extends eZPersistentObject
                                                     $asObject );
     }
     
-    function userExists( $userID, $eventID )
+    static function userExists( $userID, $eventID )
     {
         $custom = array( array( 'operation' => 'count(*)',
                                 'name' => 'count' ) );
@@ -107,7 +107,7 @@ class xrowEventPersons extends eZPersistentObject
             return false;
     }
     
-    function fetchUser( $userID, $eventID, $asObject = true )
+    static function fetchUser( $userID, $eventID, $asObject = true )
     {
         return eZPersistentObject::fetchObject( xrowEventPersons::definition(),
                                                 null,
@@ -116,7 +116,7 @@ class xrowEventPersons extends eZPersistentObject
                                                 $asObject );
     }
     
-    function addPerson( $userID, $eventID )
+    static function addPerson( $userID, $eventID )
     {
         $person = xrowEventPersons::fetchUser( $userID, $eventID );
         
@@ -130,7 +130,7 @@ class xrowEventPersons extends eZPersistentObject
         return $person;
     }
     
-    function removePerson( $userID, $eventID )
+    static function removePerson( $userID, $eventID )
     {
         $cond = array( 'user_id' => $userID, 'event_id' => $eventID );
         
@@ -138,7 +138,7 @@ class xrowEventPersons extends eZPersistentObject
                                           $cond );
     }
     
-    function removeEvent( $eventID )
+    static function removeEvent( $eventID )
     {
         $cond = array( 'event_id' => $eventID );
         

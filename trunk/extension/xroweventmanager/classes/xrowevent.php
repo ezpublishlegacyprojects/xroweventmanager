@@ -17,7 +17,7 @@ class xrowEvent extends eZPersistentObject
 		$this->eZPersistentObject( $row );
 	}
 
-	function definition()
+	static function definition()
     {
         return array( 'fields' => array( 'start_date' => array( 'name' => 'StartDate',
                                                         'datatype' => 'ingeger',
@@ -92,7 +92,7 @@ class xrowEvent extends eZPersistentObject
         return xrowEventPersons::countPersons( $this->attribute( 'contentobject_id' ) );
     }
 
-    function fetch( $contentObjectID, $asObject = true )
+    static function fetch( $contentObjectID, $asObject = true )
     {
         return eZPersistentObject::fetchObject( xrowEvent::definition(),
                                                 null,
@@ -180,7 +180,7 @@ class xrowEvent extends eZPersistentObject
         }
     }
 
-    function saveEvent( $data )
+    static function saveEvent( $data )
     {
         $event = xrowEvent::fetch( $data['contentobject_id'] );
         if ( !is_object( $event ) )
@@ -200,7 +200,7 @@ class xrowEvent extends eZPersistentObject
         return $event;
     }
 
-    function removeEvent( $contentObjectID = false )
+    static function removeEvent( $contentObjectID = false )
     {
         if ( !$contentObjectID )
             $contentObjectID = $this->attribute( 'contentobject_id' );
@@ -233,7 +233,7 @@ class xrowEvent extends eZPersistentObject
         return $statusArray[$status];
     }
 
-    function fetchEvents( $asObject, $offset, $limit, $sortField, $sortOrder )
+    static function fetchEvents( $asObject, $offset, $limit, $sortField, $sortOrder )
     {
         $user =& eZUser::currentUser();
         $userID = $user->id();
@@ -307,7 +307,7 @@ class xrowEvent extends eZPersistentObject
             return $result;
     }
 
-    function eventCount()
+    static function eventCount()
     {
         $user =& eZUser::currentUser();
         $userID = $user->id();

@@ -157,7 +157,7 @@ class xrowEventType extends eZDataType
      Validates the input and returns true if the input was
      valid for this datatype.
     */
-    function validateObjectAttributeHTTPInput( &$http, $base, &$contentObjectAttribute )
+    function validateObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
         if ( $http->hasPostVariable( $base . '_xrowevent_start_year_' . $contentObjectAttribute->attribute( 'id' ) ) and
              $http->hasPostVariable( $base . '_xrowevent_start_month_' . $contentObjectAttribute->attribute( 'id' ) ) and
@@ -221,7 +221,7 @@ class xrowEventType extends eZDataType
     /*!
      Fetches the http post var integer input and stores it in the data instance.
     */
-    function fetchObjectAttributeHTTPInput( &$http, $base, &$contentObjectAttribute )
+    function fetchObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
         if ( $http->hasPostVariable( $base . '_xrowevent_start_year_' . $contentObjectAttribute->attribute( 'id' ) ) and
              $http->hasPostVariable( $base . '_xrowevent_start_month_' . $contentObjectAttribute->attribute( 'id' ) ) and
@@ -304,7 +304,7 @@ class xrowEventType extends eZDataType
         return false;
     }
 
-    function hasObjectAttributeContent( &$contentObjectAttribute )
+    function hasObjectAttributeContent( $contentObjectAttribute )
     {
         $eventID = $contentObjectAttribute->attribute( 'contentobject_id' );
         $event = xrowEvent::fetch( $eventID );
@@ -323,7 +323,7 @@ class xrowEventType extends eZDataType
     /*!
      Returns the content.
     */
-    function &objectAttributeContent( &$contentObjectAttribute )
+    function objectAttributeContent( $contentObjectAttribute )
     {
         if ( isset( $GLOBALS['xrowEventManagerCache'][$contentObjectAttribute->ContentObjectID][$contentObjectAttribute->Version] ) )
             return $GLOBALS['xrowEventManagerCache'][$contentObjectAttribute->ContentObjectID][$contentObjectAttribute->Version];
@@ -343,7 +343,7 @@ class xrowEventType extends eZDataType
         }
     }
 
-    function storeObjectAttribute( &$contentObjectAttribute )
+    function storeObjectAttribute( $contentObjectAttribute )
     {
         if ( isset( $GLOBALS['xrowEventManagerCache'][$contentObjectAttribute->ContentObjectID][$contentObjectAttribute->Version] ) )
             unset( $GLOBALS['xrowEventManagerCache'][$contentObjectAttribute->ContentObjectID][$contentObjectAttribute->Version] );
@@ -368,7 +368,7 @@ class xrowEventType extends eZDataType
     /*!
      \reimp
     */
-    function title( &$contentObjectAttribute, $name = 'original_filename' )
+    function title( $contentObjectAttribute, $name = 'original_filename' )
     {
         $eventObj = $contentObjectAttribute->content();
         if ( is_object( $eventObj ) )
@@ -399,7 +399,7 @@ class xrowEventType extends eZDataType
     /*!
      \reimp
     */
-    function customObjectAttributeHTTPAction( $http, $action, &$contentObjectAttribute, $parameters )
+    function customObjectAttributeHTTPAction( $http, $action, $contentObjectAttribute, $parameters )
     {
         switch ( $action )
         {
@@ -495,7 +495,7 @@ class xrowEventType extends eZDataType
     /*!
      \reimp
     */
-    function deleteStoredObjectAttribute( &$contentObjectAttribute, $version = null )
+    function deleteStoredObjectAttribute( $contentObjectAttribute, $version = null )
     {
         $db =& eZDB::instance();
         $contentObjectID = $contentObjectAttribute->attribute( "contentobject_id" );
@@ -512,7 +512,7 @@ class xrowEventType extends eZDataType
     /*!
      \reimp
     */
-    function sortKey( &$contentObjectAttribute )
+    function sortKey( $contentObjectAttribute )
     {
         return (int)$contentObjectAttribute->attribute( 'data_int' );
     }
