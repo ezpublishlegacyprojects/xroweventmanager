@@ -1,23 +1,18 @@
 <?php
 
-include_once( 'kernel/classes/ezdatatype.php' );
-include_once( 'extension/xroweventmanager/classes/xrowevent.php' );
-include_once( 'lib/ezlocale/classes/ezlocale.php' );
-
-define( "EZ_DATATYPESTRING_XROWEVENT", "xrowevent" );
-define( 'EZ_DATATYPESTRING_XROWEVENT_DEFAULT_EMTPY', 0 );
-define( 'EZ_DATATYPESTRING_XROWEVENT_DEFAULT_CURRENT_DATE', 1 );
-
-define( 'EZ_DATATYPESTRING_XROWEVENT_DEFAULT_START', 'data_int1' );
-define( 'EZ_DATATYPESTRING_XROWEVENT_DEFAULT_end', 'data_int2' );
-
-define( 'EZ_DATATYPESTRING_XROWEVENT_DEFAULT_MAX', 'data_int3' );
+require_once ( 'kernel/common/i18n.php' );
 
 class xrowEventType extends eZDataType
 {
+	const DATA_TYPE_STRING = 'xrowevent';
+	const DEFAULT_EMTPY = 0;
+	const DEFAULT_START = 'data_int1';
+	const DEFAULT_END = 'data_int2';
+	const DEFAULT_MAX = 'data_int3';
+
     function xrowEventType()
     {
-        $this->eZDataType( EZ_DATATYPESTRING_XROWEVENT,
+        $this->eZDataType( xrowEventType::DATA_TYPE_STRING,
                            ezi18n( 'extension/xroweventmanager', "xrow Event", 'Datatype name' ),
                            array( 'serialize_supported' => false,
                                   'translation_allowed' => false ) );
@@ -51,19 +46,19 @@ class xrowEventType extends eZDataType
                 $starthour == '' and $startminute == '' ) )
         {
             $state = eZDateTimeValidator::validateDate( $startday, $startmonth, $startyear );
-            if ( $state == EZ_INPUT_VALIDATOR_STATE_INVALID )
+            if ( $state == eZInputValidator::STATE_INVALID )
             {
                 $contentObjectAttribute->setValidationError( ezi18n( 'extension/xroweventmanager',
                                                                      'Start date is not valid.' ) );
-                return EZ_INPUT_VALIDATOR_STATE_INVALID;
+                return eZInputValidator::STATE_INVALID;
             }
 
             $state = eZDateTimeValidator::validateTime( $starthour, $startminute );
-            if ( $state == EZ_INPUT_VALIDATOR_STATE_INVALID )
+            if ( $state == eZInputValidator::STATE_INVALID )
             {
                 $contentObjectAttribute->setValidationError( ezi18n( 'extension/xroweventmanager',
                                                                      'Start time is not valid.' ) );
-                return EZ_INPUT_VALIDATOR_STATE_INVALID;
+                return eZInputValidator::STATE_INVALID;
             }
             $startCheck = true;
         }
@@ -72,19 +67,19 @@ class xrowEventType extends eZDataType
                 $endhour == '' and $endminute == '' ) )
         {
             $state = eZDateTimeValidator::validateDate( $endday, $endmonth, $endyear );
-            if ( $state == EZ_INPUT_VALIDATOR_STATE_INVALID )
+            if ( $state == eZInputValidator::STATE_INVALID )
             {
                 $contentObjectAttribute->setValidationError( ezi18n( 'extension/xroweventmanager',
                                                                      'end date is not valid.' ) );
-                return EZ_INPUT_VALIDATOR_STATE_INVALID;
+                return eZInputValidator::STATE_INVALID;
             }
 
             $state = eZDateTimeValidator::validateTime( $endhour, $endminute );
-            if ( $state == EZ_INPUT_VALIDATOR_STATE_INVALID )
+            if ( $state == eZInputValidator::STATE_INVALID )
             {
                 $contentObjectAttribute->setValidationError( ezi18n( 'extension/xroweventmanager',
                                                                      'end time is not valid.' ) );
-                return EZ_INPUT_VALIDATOR_STATE_INVALID;
+                return eZInputValidator::STATE_INVALID;
             }
             $endCheck = true;
         }
@@ -95,30 +90,30 @@ class xrowEventType extends eZDataType
             {
                 $contentObjectAttribute->setValidationError( ezi18n( 'extension/xroweventmanager',
                                                                      'Enter a number at the max. member field.' ) );
-                return EZ_INPUT_VALIDATOR_STATE_INVALID;
+                return eZInputValidator::STATE_INVALID;
             }
 
             if ( $maxparticipants < 0 )
             {
                 $contentObjectAttribute->setValidationError( ezi18n( 'extension/xroweventmanager',
                                                                      'The max. member number must not be lower than 0.' ) );
-                return EZ_INPUT_VALIDATOR_STATE_INVALID;
+                return eZInputValidator::STATE_INVALID;
             }
 
             $contentObjectID = $contentObjectAttribute->attribute( "contentobject_id" );
             $participantCount = xrowEventParticipants::countParticipants( $contentObjectID );
-            if ( $participantCount > $maxparticipants and $status != XROW_EVENT_STATUS_EVENT_CANCELED )
+            if ( $participantCount > $maxparticipants and $status != xrowEvent::STATUS_EVENT_CANCELED )
             {
                 $contentObjectAttribute->setValidationError( ezi18n( 'extension/xroweventmanager',
                                                                       "The number of participants who have already joined this event is higher than the number of the max. participants.
                                                                        Increase the maximum number or delete participants from the event." ) );
-                return EZ_INPUT_VALIDATOR_STATE_INVALID;
+                return eZInputValidator::STATE_INVALID;
             }
-            else if ( $participantCount == $maxparticipants and $status == XROW_EVENT_STATUS_PLACES_AVAILABLE )
+            else if ( $participantCount == $maxparticipants and $status == xrowEvent::STATUS_PLACES_AVAILABLE )
             {
                 $contentObjectAttribute->setValidationError( ezi18n( 'extension/xroweventmanager',
                                                                       "This event has already reached the maximum number of participants. Please change the status of the event." ) );
-                return EZ_INPUT_VALIDATOR_STATE_INVALID;
+                return eZInputValidator::STATE_INVALID;
             }
         }
 
@@ -128,7 +123,7 @@ class xrowEventType extends eZDataType
             {
                 $contentObjectAttribute->setValidationError( ezi18n( 'extension/xroweventmanager',
                                                                      "The event status isn't correct." ) );
-                return EZ_INPUT_VALIDATOR_STATE_INVALID;
+                return eZInputValidator::STATE_INVALID;
             }
         }
 
@@ -146,11 +141,11 @@ class xrowEventType extends eZDataType
             {
                 $contentObjectAttribute->setValidationError( ezi18n( 'extension/xroweventmanager',
                                                                      "The event ends before it starts. Please correct the end date of the event." ) );
-                return EZ_INPUT_VALIDATOR_STATE_INVALID;
+                return eZInputValidator::STATE_INVALID;
             }
         }
 
-        return EZ_INPUT_VALIDATOR_STATE_ACCEPTED;
+        return eZInputValidator::STATE_ACCEPTED;
     }
 
     /*!
@@ -215,7 +210,9 @@ class xrowEventType extends eZDataType
 
         }
         else
-            return EZ_INPUT_VALIDATOR_STATE_ACCEPTED;
+        {
+            return eZInputValidator::STATE_ACCEPTED;
+        }
     }
 
     /*!
@@ -261,7 +258,7 @@ class xrowEventType extends eZDataType
             if ( $http->hasPostVariable( $base . '_xrowevent_status_' . $contentObjectAttribute->attribute( 'id' ) ) )
                 $data['status'] = $http->postVariable( $base . '_xrowevent_status_' . $contentObjectAttribute->attribute( 'id' ) );
             else
-                $data['status'] = XROW_EVENT_STATUS_PLACES_AVAILABLE;
+                $data['status'] = xrowEvent::STATUS_PLACES_AVAILABLE;
 
             if ( ( $startyear == '' and $startmonth == ''and $startday == '' and
                    $starthour == '' and $startminute == '' ) or
@@ -336,7 +333,7 @@ class xrowEventType extends eZDataType
                 $eventObj = new xrowEvent( array( 'contentobject_id' => $eventID,
                                                   'start_date' => 0,
                                                   'end_date' => 0,
-                                                  'status' => XROW_EVENT_STATUS_DRAFT,
+                                                  'status' => xrowEvent::STATUS_DRAFT,
                                                   'max_participants' => 0 ) );
             $GLOBALS['xrowEventManagerCache'][$contentObjectAttribute->ContentObjectID][$contentObjectAttribute->Version] = $eventObj;
             return $eventObj;
@@ -526,5 +523,5 @@ class xrowEventType extends eZDataType
     }
 }
 
-eZDataType::register( EZ_DATATYPESTRING_XROWEVENT, "xrowEventType" );
+eZDataType::register( xrowEventType::DATA_TYPE_STRING, "xrowEventType" );
 ?>

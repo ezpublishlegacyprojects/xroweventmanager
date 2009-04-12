@@ -1,17 +1,12 @@
 <?php
 
-include_once( 'kernel/classes/ezpersistentobject.php' );
-include_once( 'kernel/classes/datatypes/ezuser/ezuser.php' );
-include_once( 'extension/xroweventmanager/classes/xrowevent_persons.php' );
-include_once( 'extension/xroweventmanager/classes/xrowevent_participants.php' );
-
-define( 'XROW_EVENT_STATUS_DRAFT', 0 );
-define( 'XROW_EVENT_STATUS_PLACES_AVAILABLE', 1 );
-define( 'XROW_EVENT_STATUS_NO_PLACES', 2 );
-define( 'XROW_EVENT_STATUS_EVENT_CANCELED', 3 );
-
 class xrowEvent extends eZPersistentObject
 {
+	const STATUS_DRAFT = 0;
+	const STATUS_PLACES_AVAILABLE = 1;
+	const STATUS_NO_PLACES = 2;
+	const STATUS_EVENT_CANCELED = 3;
+	
 	function xrowEvent( $row )
 	{
 		$this->eZPersistentObject( $row );
@@ -143,7 +138,7 @@ class xrowEvent extends eZPersistentObject
                 $participantCount = $this->countParticipants();
                 if ( $participantCount == $maxParticipants )
                 {
-                    $this->setAttribute( 'status', XROW_EVENT_STATUS_NO_PLACES );
+                    $this->setAttribute( 'status', xrowEvent::STATUS_NO_PLACES );
                     $this->store();
                 }
                 return $result;
@@ -168,11 +163,11 @@ class xrowEvent extends eZPersistentObject
         {
             $participantCount = $this->countParticipants();
             $status = $this->attribute( 'status' );
-            if ( $status == XROW_EVENT_STATUS_NO_PLACES )
+            if ( $status == xrowEvent::STATUS_NO_PLACES )
             {
                 if ( $participantCount < $maxParticipants )
                 {
-                    $status = XROW_EVENT_STATUS_PLACES_AVAILABLE;
+                    $status = xrowEvent::STATUS_PLACES_AVAILABLE;
                     $this->setAttribute( 'status', $status );
                     $this->store();
                 }
@@ -220,9 +215,9 @@ class xrowEvent extends eZPersistentObject
 
     function statusArray()
     {
-        return array( XROW_EVENT_STATUS_PLACES_AVAILABLE => ezi18n( 'extension/xroweventmanager', "Places available" ),
-                      XROW_EVENT_STATUS_NO_PLACES => ezi18n( 'extension/xroweventmanager', "No places available" ),
-                      XROW_EVENT_STATUS_EVENT_CANCELED => ezi18n( 'extension/xroweventmanager', "Event canceled" )
+        return array( xrowEvent::STATUS_PLACES_AVAILABLE => ezi18n( 'extension/xroweventmanager', "Places available" ),
+                      xrowEvent::STATUS_NO_PLACES => ezi18n( 'extension/xroweventmanager', "No places available" ),
+                      xrowEvent::STATUS_EVENT_CANCELED => ezi18n( 'extension/xroweventmanager', "Event canceled" )
                      );
     }
 

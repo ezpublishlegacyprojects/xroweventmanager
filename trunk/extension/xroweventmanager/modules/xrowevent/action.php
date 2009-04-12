@@ -112,7 +112,7 @@ else if ( $http->hasPostVariable( 'EventID' ) and $http->hasPostVariable( 'Cance
 
         if ( $isAdmin or $event->personUserExists() )
         {
-            $event->setAttribute( 'status', XROW_EVENT_STATUS_EVENT_CANCELED );
+            $event->setAttribute( 'status', xrowEvent::STATUS_EVENT_CANCELED );
             $event->store();
         }
     }
@@ -135,9 +135,9 @@ else if ( $http->hasPostVariable( 'EventID' ) and $http->hasPostVariable( 'Activ
         if ( $isAdmin or $event->personUserExists() )
         {
             if ( $event->attribute( 'max_participants' ) > $event->countParticipants() )
-                $event->setAttribute( 'status', XROW_EVENT_STATUS_PLACES_AVAILABLE );
+                $event->setAttribute( 'status', xrowEvent::STATUS_PLACES_AVAILABLE );
             else
-                $event->setAttribute( 'status', XROW_EVENT_STATUS_NO_PLACES );
+                $event->setAttribute( 'status', xrowEvent::STATUS_NO_PLACES );
 
             $event->store();
         }

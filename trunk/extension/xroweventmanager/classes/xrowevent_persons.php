@@ -1,9 +1,5 @@
 <?php
 
-include_once( 'kernel/classes/ezpersistentobject.php' );
-include_once( 'kernel/classes/datatypes/ezuser/ezuser.php' );
-include_once( 'kernel/classes/ezcontentobject.php' );
-
 class xrowEventPersons extends eZPersistentObject
 {
 	function xrowEventPersons( $row )
