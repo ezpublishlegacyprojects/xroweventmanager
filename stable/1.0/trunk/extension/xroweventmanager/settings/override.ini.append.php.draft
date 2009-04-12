@@ -1,0 +1,15 @@
+<?php /* #?ini charset="utf-8"?
+
+[full_xrowevent]
+Source=node/view/full.tpl
+MatchFile=full/xrowevent.tpl
+Subdir=templates
+Match[class_identifier]=xrow_event
+
+[line_xrowevent]
+Source=node/view/line.tpl
+MatchFile=line/xrowevent.tpl
+Subdir=templates
+Match[class_identifier]=xrow_event
+
+*/ ?>
